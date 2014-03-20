@@ -1,0 +1,35 @@
+%{
+
+#include <stdlib.h>
+#include <stdio.h>
+#include "test.tab.h"
+
+        
+%}
+
+%%
+
+"->" return T_ARROW;
+
+"+" return T_PLUS;
+"-" return T_MINUS;
+"/" return T_DIV;
+"*" return T_MULT;
+"==" return T_EQ;
+";" return FIN_EXPR;
+"<=" return T_LEQ;
+">=" return T_GEQ;
+"=" return T_EQUAL;
+">" return T_GE;
+"<" return T_LE;
+"||" return T_OR;
+"&&" return T_AND;
+"!" return T_NOT;
+"if" return T_IF;
+"then" return T_THEN;
+"else" return T_ELSE;
+"fun" return T_FUN;
+"let" return T_LET;
+
+[[:digit:]]+ {yylval.num = atoi(yytext); return T_NUM;}
+. {yylval.id = strdup (yytext); return T_ID;}
