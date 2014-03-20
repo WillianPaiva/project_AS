@@ -31,5 +31,6 @@
 "fun" return T_FUN;
 "let" return T_LET;
 
+[[:space:]] ;
 [[:digit:]]+ {yylval.num = atoi(yytext); return T_NUM;}
 . {yylval.id = strdup (yytext); return T_ID;}

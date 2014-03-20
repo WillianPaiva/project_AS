@@ -7,7 +7,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdbool.h>
-#include "machine.h"
+#include "../interface/machine.h"
 
   struct env * env=NULL;
   struct configuration concrete_conf;
@@ -26,19 +26,24 @@
 %token<id>T_ID
 %token FIN_EXPR T_PLUS T_MINUS T_MULT T_DIV T_LEQ T_LE T_GEQ T_GE T_EQ T_OR T_AND T_NOT T_EQUAL T_IF T_ELSE T_THEN T_FUN T_ARROW T_LET
 
-%right T_EQ
+%right T_EQUAL T_ARROW
+%right T_LET T_FUN T_IF T_THEN 
+%right T_ELSE
 %left T_PLUS T_MINUS
 %left T_MULT T_DIV
+%right  T_LEQ T_LE T_GE T_GEQ T_OR T_AND T_NOT T_EQ
 
 %type<expr> e
 	
 %%
-s: 	T_LET T_ID[x] T_EQUAL e[expr] FIN_EXPR {env = push_rec_env($x,$expr,env);}
-	| e[expr] FIN_EXPR {conf->closure = mk_closure($expr,env); conf->stack=NULL; step(conf); 
+s: 
+	s e[expr] FIN_EXPR {conf->closure = mk_closure($expr,env); conf->stack=NULL; step(conf); 
 		if(conf->closure->expr->type==NUM){
 		printf(">>> %d\n",conf->closure->expr->expr->num);
 		}	
 	}
+        | 	T_LET T_ID[x] T_EQUAL e[expr] FIN_EXPR {env = push_rec_env($x,$expr,env);}
+        |
 	;
 
 

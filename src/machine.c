@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
-#include "machine.h"
+#include "../interface/machine.h"
 
 #define MAX_CLOSURE 1000000
 

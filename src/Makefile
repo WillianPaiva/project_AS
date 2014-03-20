@@ -14,10 +14,10 @@ CFLAGS=-std=c99 -g -pedantic -Wall -Wextra -Wshadow -Wpointer-arith -Wcast-qual 
 %.tab.o : %.tab.c
 	$(CC) -c -o $@ $<
 
-expr.o : expr.c
+expr.o : expr.c 
 	$(CC) -c -o $@ $<
 
-machine.o : machine.c
+machine.o : machine.c 
 	$(CC) -c -o $@ $<
 
 %.out : %.yy.o %.tab.o machine.o expr.o 

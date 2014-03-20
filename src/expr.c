@@ -1,6 +1,6 @@
 
 #include <stdlib.h>
-#include "expr.h"
+#include "../interface/expr.h"
 
 struct expr *mk_node(void){
   struct expr *e = malloc(sizeof(struct expr));
