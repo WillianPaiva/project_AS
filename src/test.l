@@ -10,7 +10,6 @@
 %%
 
 "->" return T_ARROW;
-
 "+" return T_PLUS;
 "-" return T_MINUS;
 "/" return T_DIV;

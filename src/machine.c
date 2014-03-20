@@ -148,7 +148,7 @@ void step(struct configuration *conf){
        conf->closure = mk_closure(mk_int(k1-k2),NULL);return;
      case MULT: //printf("mult\n");
        conf->closure = mk_closure(mk_int(k1*k2),NULL);return;
-     case DIV: assert(k2!=0); conf->closure =  mk_closure(mk_int(k1-k2),NULL);return;
+     case DIV: assert(k2!=0); conf->closure =  mk_closure(mk_int(k1/k2),NULL);return;
      case LEQ: //printf("%d <= %d \n",k1,k2);
        conf->closure = mk_closure(mk_int(k1 <= k2),NULL); return;
      case LE: conf->closure = mk_closure(mk_int(k1 < k2),NULL); return;
