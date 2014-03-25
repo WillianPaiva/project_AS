@@ -9,9 +9,10 @@
 #include <stdbool.h>
 #include "../interface/machine.h"
 
-struct env *env=NULL;
+  struct env *env = NULL;
   struct configuration concrete_conf;
   struct configuration *conf = &concrete_conf;
+  struct closure *temp;
 %}
 
 
@@ -20,6 +21,7 @@ struct env *env=NULL;
   char* id;
   int num;
   struct expr *expr;
+  struct env *env;
 }
 
 %token<num>T_NUM
@@ -34,6 +36,7 @@ struct env *env=NULL;
 %right  T_LEQ T_LE T_GE T_GEQ T_OR T_AND T_NOT T_EQ
 
 %type<expr> e
+%type<env> en
 	
 %%
 s       :s e[expr] FIN_EXPR {conf->closure = mk_closure($expr,env); conf->stack=NULL; step(conf); 
@@ -41,10 +44,15 @@ s       :s e[expr] FIN_EXPR {conf->closure = mk_closure($expr,env); conf->stack=
 		            printf(">>> %d\n",conf->closure->expr->expr->num);
 		    }	
 	        }
-        |T_LET T_ID[x] T_EQUAL e[expr] FIN_EXPR                 {env = push_rec_env($x,$expr,env);print_env(env);}
-        |T_FUN T_ID[var] T_ARROW e[expr]  FIN_EXPR              {env = push_rec_env($var,mk_fun($var,$expr),env); print_env(env);}
+        |s en FIN_EXPR {env = $2;print_env(env);}
         |
-	    ;
+        ;
+
+en  :T_LET T_ID[x] T_EQUAL e[expr]                                  {$$ = push_rec_env($x,$expr,env);}
+    |T_FUN T_ID[var] T_ARROW e[expr]                                {$$ = push_rec_env($var,mk_fun($var,$expr),env);}
+    ;
+
+
 
 
 	
@@ -59,17 +67,20 @@ e   :T_NUM                                                          {$$ = mk_int
 	|e T_GE e                                                       {$$ = mk_app(mk_app(mk_op(GE),$1),$3) ;}
 	|e T_OR e                                                       {$$ = mk_app(mk_app(mk_op(OR),$1),$3) ;}
 	|e T_AND e                                                      {$$ = mk_app(mk_app(mk_op(AND),$1),$3) ;}
-	|T_NOT e[expr]                                                  {$$ = mk_app(mk_op(NOT),$expr) ;}
-	|T_ID                                                           {$$ = mk_id($1);}
+    |T_ID                                                           {$$ = mk_id($1);}
+	|T_NOT e[expr]                                          {$$ = mk_app(mk_op(NOT),$expr) ;}
 	|T_IF e[cond] T_THEN e[then_br] T_ELSE e[else_br]               {$$ = mk_cond($cond, $then_br, $else_br) ;}
-    |e[fun] e[arg]                                                  {$$=mk_app($fun,$arg);} 
+    |e[fun] e[arg]                                                  {$$ = mk_app($fun,$arg);} 
     ;
+
+
+
 
 %%
 
 int main(int argc, char *argv[])
 {
-   yyparse();
+      yyparse();
 
   return EXIT_SUCCESS;
 }
