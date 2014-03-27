@@ -44,7 +44,7 @@ s       :s e[expr] FIN_EXPR {conf->closure = mk_closure($expr,env); conf->stack=
      printf(">>> %d\n",conf->closure->expr->expr->num);
    }	
  }
-|s en FIN_EXPR {env = $2;print_env(env);}
+|s en FIN_EXPR {env = $2;}
 |
 ;
 
@@ -63,6 +63,7 @@ e   :T_NUM                                                          {$$ = mk_int
 	|e T_OR e                                                       {$$ = mk_app(mk_app(mk_op(OR),$1),$3) ;}
 	|e T_AND e                                                      {$$ = mk_app(mk_app(mk_op(AND),$1),$3) ;}
     |T_ID                                                           {$$ = mk_id($1);}
+    |e T_EQ e                                                       {$$ = mk_app(mk_app(mk_op(EQ),$1),$3) ;}
 	|T_NOT e[expr]                                                  {$$ = mk_app(mk_op(NOT),$expr) ;}
     |T_FUN T_ID[var] T_ARROW e[expr]                                {$$ = mk_fun($var,$expr);env = push_rec_env($var,$$,env);}
 	|T_IF e[cond] T_THEN e[then_br] T_ELSE e[else_br]               {$$ = mk_cond($cond, $then_br, $else_br) ;}
