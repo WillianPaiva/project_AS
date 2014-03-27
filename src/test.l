@@ -29,6 +29,8 @@
 "else" return T_ELSE;
 "fun" return T_FUN;
 "let" return T_LET;
+"in" return T_IN;
+"where" return T_WHERE;
 
 [[:space:]] ;
 [[:digit:]]+ {yylval.num = atoi(yytext); return T_NUM;}
