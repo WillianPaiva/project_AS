@@ -49,7 +49,6 @@ s       :s e[expr] FIN_EXPR {conf->closure = mk_closure($expr,env); conf->stack=
         ;
 
 en  :T_LET T_ID[x] T_EQUAL e[expr]                                  {$$ = push_rec_env($x,$expr,env);}
-    |T_FUN T_ID[var] T_ARROW e[expr]                                {$$ = push_rec_env($var,mk_fun($var,$expr),env);}
     ;
 
 
@@ -68,9 +67,11 @@ e   :T_NUM                                                          {$$ = mk_int
 	|e T_OR e                                                       {$$ = mk_app(mk_app(mk_op(OR),$1),$3) ;}
 	|e T_AND e                                                      {$$ = mk_app(mk_app(mk_op(AND),$1),$3) ;}
     |T_ID                                                           {$$ = mk_id($1);}
-	|T_NOT e[expr]                                          {$$ = mk_app(mk_op(NOT),$expr) ;}
+	|T_NOT e[expr]                                                  {$$ = mk_app(mk_op(NOT),$expr) ;}
+    |T_FUN T_ID[var] T_ARROW e[expr]                                {$$ = mk_fun($var,$expr);env = push_rec_env($var,$$,env);}
 	|T_IF e[cond] T_THEN e[then_br] T_ELSE e[else_br]               {$$ = mk_cond($cond, $then_br, $else_br) ;}
     |e[fun] e[arg]                                                  {$$ = mk_app($fun,$arg);} 
+    | '(' e ')'                                                     {$$ = $2;}
     ;
 
 
