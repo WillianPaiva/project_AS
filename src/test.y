@@ -40,21 +40,17 @@
 	
 %%
 s       :s e[expr] FIN_EXPR {conf->closure = mk_closure($expr,env); conf->stack=NULL; step(conf); 
-		        if(conf->closure->expr->type==NUM){
-		            printf(">>> %d\n",conf->closure->expr->expr->num);
-		    }	
-	        }
-        |s en FIN_EXPR {env = $2;print_env(env);}
-        |
-        ;
+   if(conf->closure->expr->type==NUM){
+     printf(">>> %d\n",conf->closure->expr->expr->num);
+   }	
+ }
+|s en FIN_EXPR {env = $2;print_env(env);}
+|
+;
 
 en  :T_LET T_ID[x] T_EQUAL e[expr]                                  {$$ = push_rec_env($x,$expr,env);}
     ;
 
-
-
-
-	
 e   :T_NUM                                                          {$$ = mk_int($1);}        
 	|e T_PLUS e                                                     {$$ = mk_app(mk_app(mk_op(PLUS),$1),$3);}
     |e T_MINUS e                                                    {$$ = mk_app(mk_app(mk_op(MINUS),$1),$3);}
@@ -72,6 +68,24 @@ e   :T_NUM                                                          {$$ = mk_int
 	|T_IF e[cond] T_THEN e[then_br] T_ELSE e[else_br]               {$$ = mk_cond($cond, $then_br, $else_br) ;}
     |e[fun] e[arg]                                                  {$$ = mk_app($fun,$arg);} 
     | '(' e ')'                                                     {$$ = $2;}
+    ;
+
+e   :T_NUM                                                          {$$ = mk_int($1);}  
+    |"(" e[expr] ")"                                                {$$ = $expr;}      
+    |e T_PLUS e                                                     {$$ = mk_app(mk_app(mk_op(PLUS),$1),$3);}
+    |e T_MINUS e                                                    {$$ = mk_app(mk_app(mk_op(MINUS),$1),$3);}
+    |e T_DIV e                                                      {$$ = mk_app(mk_app(mk_op(DIV),$1),$3);}
+    |e T_MULT e                                                     {$$ = mk_app(mk_app(mk_op(MULT),$1),$3);}
+    |e T_LEQ e                                                      {$$ = mk_app(mk_app(mk_op(LEQ),$1),$3) ;}
+    |e T_LE e                                                       {$$ = mk_app(mk_app(mk_op(LE),$1),$3) ;}
+    |e T_GEQ e                                                      {$$ = mk_app(mk_app(mk_op(GEQ),$1),$3) ;}
+    |e T_GE e                                                       {$$ = mk_app(mk_app(mk_op(GE),$1),$3) ;}
+    |e T_OR e                                                       {$$ = mk_app(mk_app(mk_op(OR),$1),$3) ;}
+    |e T_AND e                                                      {$$ = mk_app(mk_app(mk_op(AND),$1),$3) ;}
+    |T_ID                                                           {$$ = mk_id($1);}
+    |T_NOT e[expr]                                                  {$$ = mk_app(mk_op(NOT),$expr) ;}
+    |T_IF e[cond] T_THEN e[then_br] T_ELSE e[else_br]               {$$ = mk_cond($cond, $then_br, $else_br) ;}
+    |e[fun] e[arg]                                                  {$$ = mk_app($fun,$arg);}
     ;
 
 
