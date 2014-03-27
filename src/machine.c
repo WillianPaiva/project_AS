@@ -128,7 +128,7 @@ void step(struct configuration *conf){
      step(conf);
      if(conf->closure->expr->type!=NUM){exit(EXIT_FAILURE);}
      int k1 = conf->closure->expr->expr->num;
-     if(conf->closure->expr->expr->op==NOT){
+     if(expr->expr->op==NOT){
        conf->closure->expr->expr->num = !k1;
        return;
      }

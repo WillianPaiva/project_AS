@@ -1,3 +1,8 @@
 let x = 5;
 
 x+6;
+let div_rec = fun p -> fun n -> fun acc -> if p<n then acc else div_rec (p-n) n (acc+1);
+let div = fun p -> fun n -> div_rec p n 0;
+div 12 3;
+let fac = fun n -> (if n<=0 then (fun fac -> 1) else fun fac -> n * fac (n-1)) fac;
+fac - 1;
