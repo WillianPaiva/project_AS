@@ -65,19 +65,14 @@ e   :	T_NUM                                                          {$$ = mk_in
 	|T_ID                                                           {$$ = mk_id($1);}
 	|e T_EQ e                                                       {$$ = mk_app(mk_app(mk_op(EQ),$1),$3) ;}
 	|T_NOT e[expr]                                                  {$$ = mk_app(mk_op(NOT),$expr) ;}
-	|T_FUN T_ID[var] T_ARROW e[expr]                                {$$ = mk_fun($var,$expr);env = push_rec_env($var,$$,env);}
-	|T_IF e[cond] T_THEN e[then_br] T_ELSE e[else_br]               {$$ = mk_cond($cond, $then_br, $else_br) ;}
+        |T_FUN T_ID[var] arg_list[expr]                                 {$$ = mk_fun($var,$expr);env = push_rec_env($var,$$,env);}                    
 	|e[fun] e[arg]                                                  {$$ = mk_app($fun,$arg);}
 	|T_LET T_ID[x] T_EQUAL e[arg] T_IN e[exp]			{$$ = mk_app(mk_fun($x,$exp),$arg) ;}
 	|e[exp] T_WHERE T_ID[x] T_EQUAL e[arg]				{$$ = mk_app(mk_fun($x,$exp),$arg) ;}
-	| '(' e ')'                                                     {$$ = $2;}
-	;
-
-    |T_FUN T_ID[var] arg_list[expr]                                 {$$ = mk_fun($var,$expr);env = push_rec_env($var,$$,env);}
 	|T_IF e[cond] T_THEN e[then_br] T_ELSE e[else_br]               {$$ = mk_cond($cond, $then_br, $else_br) ;}
-    |apli                                                           {$$ = $1;}
-    | '(' e ')'                                                     {$$ = $2;}
-    ;
+        |apli                                                           {$$ = $1;}
+        | '(' e ')'                                                     {$$ = $2;}
+        ;
 
 
 arg_list:T_ARROW e                                                  {$$=$2;}
