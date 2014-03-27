@@ -35,7 +35,7 @@
 %left T_MULT T_DIV
 %right  T_LEQ T_LE T_GE T_GEQ T_OR T_AND T_NOT T_EQ
 
-%type<expr> e
+%type<expr> e arg_list apli
 %type<env> en
 	
 %%
@@ -44,10 +44,10 @@ s       :s e[expr] FIN_EXPR {conf->closure = mk_closure($expr,env); conf->stack=
      printf(">>> %d\n",conf->closure->expr->expr->num);
    }	
  }
-|s en FIN_EXPR {env = $2;}
+|s en FIN_EXPR {env = $2;print_env(env);}
 |
 ;
-
+                                      
 en  :T_LET T_ID[x] T_EQUAL e[expr]                                  {$$ = push_rec_env($x,$expr,env);}
     ;
 	
@@ -73,8 +73,19 @@ e   :	T_NUM                                                          {$$ = mk_in
 	| '(' e ')'                                                     {$$ = $2;}
 	;
 
+    |T_FUN T_ID[var] arg_list[expr]                                 {$$ = mk_fun($var,$expr);env = push_rec_env($var,$$,env);}
+	|T_IF e[cond] T_THEN e[then_br] T_ELSE e[else_br]               {$$ = mk_cond($cond, $then_br, $else_br) ;}
+    |apli                                                           {$$ = $1;}
+    | '(' e ')'                                                     {$$ = $2;}
+    ;
 
 
+arg_list:T_ARROW e                                                  {$$=$2;}
+        |T_ID[var] arg_list                                         {$$=mk_fun ($1, $2); env = push_rec_env($var,$$,env);}
+        ;
+
+apli       :e[fun] e[arg]                                         {$$ = mk_app($fun,$arg); printf("test 1");}
+           ;
 
 
 %%
