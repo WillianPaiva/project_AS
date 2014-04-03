@@ -39,7 +39,7 @@
 %left T_PLUS T_MINUS
 %left T_MULT T_DIV
 
-%type<expr> e arg_list
+%type<expr> e arg_list f_arg
 %type<env> en
 	
 %%
@@ -73,9 +73,13 @@ e   :T_NUM                                                          {$$ = mk_int
     |T_LET T_ID[x] T_EQUAL e[arg] T_IN e[exp]		        {$$ = mk_app(mk_fun($x,$exp),$arg); env = push_rec_env($x,$$,env);}
     |e[exp] T_WHERE T_ID[x] T_EQUAL e[arg]			        {$$ = mk_app(mk_fun($x,$exp),$arg); env = push_rec_env($x,$$,env);}
 	|T_IF e[cond] T_THEN e[then_br] T_ELSE e[else_br]               {$$ = mk_cond($cond, $then_br, $else_br) ;}
-    |'(' e[fun] e[arg] ')'                                                 {$$ = mk_app($fun,$arg);}
+    |'(' e[fun] f_arg[arg] ')'                                                 {$$ = mk_app($fun,$arg);}
     |'(' e ')'                                                      {$$ = $2;}
-        ;
+    ;
+
+f_arg :e                                                            {$$ = $1;}
+      |f_arg[fun] e[arg]                                            {$$ = mk_app($fun,$arg);}
+
 
 
 
