@@ -49,7 +49,7 @@ s       :s e[expr] FIN_EXPR {conf->closure = mk_closure($expr,env); conf->stack=
    }	
  }
 |s en FIN_EXPR {env = $2;}
-|s T_PRINT FIN_EXPR     {printf("%s",$2);}
+|s T_PRINT FIN_EXPR     {printf("%s\n",$2);}
 |
 ;
                                       
