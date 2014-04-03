@@ -28,12 +28,13 @@
 %token<id>T_ID
 %token FIN_EXPR T_PLUS T_MINUS T_MULT T_DIV T_LEQ T_LE T_GEQ T_GE T_EQ T_OR T_AND T_NOT T_EQUAL T_IF T_ELSE T_THEN T_FUN T_ARROW T_LET T_IN T_WHERE
 
-%right T_EQUAL T_ARROW
-%right T_LET T_FUN T_IF T_THEN 
-%right T_ELSE
+%nonassoc T_EQUAL T_ARROW T_LET T_FUN T_IF T_THEN T_WHERE T_IN T_ELSE
+%left  T_LEQ T_LE T_GE T_GEQ T_EQ
+%left T_OR 
+%left T_AND
+%nonassoc T_NOT
 %left T_PLUS T_MINUS
 %left T_MULT T_DIV
-%right  T_LEQ T_LE T_GE T_GEQ T_OR T_AND T_NOT T_EQ
 
 %type<expr> e arg_list
 %type<env> en
@@ -69,7 +70,7 @@ e   :T_NUM                                                          {$$ = mk_int
 	|T_LET T_ID[x] T_EQUAL e[arg] T_IN e[exp]		            	{$$ = mk_app(mk_fun($x,$exp),$arg); env = push_rec_env($x,$$,env);}
 	|e[exp] T_WHERE T_ID[x] T_EQUAL e[arg]			            	{$$ = mk_app(mk_fun($x,$exp),$arg); env = push_rec_env($x,$$,env);}
 	|T_IF e[cond] T_THEN e[then_br] T_ELSE e[else_br]               {$$ = mk_cond($cond, $then_br, $else_br) ;}
-    |e[fun] e[arg]                                                  {$$ = mk_app($fun,$arg);}
+    |'('e[fun] e[arg] ')'                                                  {$$ = mk_app($fun,$arg);}
     |'(' e ')'                                                      {$$ = $2;}
     ;
 
