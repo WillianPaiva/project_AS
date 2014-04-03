@@ -10,9 +10,9 @@ struct cell {
   struct expr* next;
 };
 
-struct list {
-  cell* top;
-};
+/* struct list { */
+/*   cell* top; */
+/* }; */
 
 struct fun{
   char *id;

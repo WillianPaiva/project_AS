@@ -60,7 +60,7 @@ struct expr *mk_cond(struct expr *cond, struct expr *then_br, struct expr *else_
 struct expr *mk_cell(struct expr* exp, struct expr* next){
   struct expr* e = mk_node();
   e->type = CELL;
-  e->expr->cell.ex = expr;
+  e->expr->cell.ex = exp;
   e->expr->cell.next = next;
   return e;
   
