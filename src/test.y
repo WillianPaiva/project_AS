@@ -66,8 +66,8 @@ e   :T_NUM                                                          {$$ = mk_int
 	|e T_EQ e                                                       {$$ = mk_app(mk_app(mk_op(EQ),$1),$3) ;}
 	|T_NOT e[expr]                                                  {$$ = mk_app(mk_op(NOT),$expr) ;}
     |T_FUN T_ID[var] arg_list[expr]                                 {$$ = mk_fun($var,$expr);env = push_rec_env($var,$$,env);}                    
-	|T_LET T_ID[x] T_EQUAL e[arg] T_IN e[exp]		            	{$$ = mk_app(mk_fun($x,$exp),$arg) ;}
-	|e[exp] T_WHERE T_ID[x] T_EQUAL e[arg]			            	{$$ = mk_app(mk_fun($x,$exp),$arg) ;}
+	|T_LET T_ID[x] T_EQUAL e[arg] T_IN e[exp]		            	{$$ = mk_app(mk_fun($x,$exp),$arg) env = push_rec_env($x,$$,env);}
+	|e[exp] T_WHERE T_ID[x] T_EQUAL e[arg]			            	{$$ = mk_app(mk_fun($x,$exp),$arg) env = push_rec_env($x,$$,env);}
 	|T_IF e[cond] T_THEN e[then_br] T_ELSE e[else_br]               {$$ = mk_cond($cond, $then_br, $else_br) ;}
     |e[fun] e[arg]                                                  {$$ = mk_app($fun,$arg);}
     |'(' e ')'                                                      {$$ = $2;}
