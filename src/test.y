@@ -28,14 +28,15 @@
 %token<id>T_ID
 %token FIN_EXPR T_PLUS T_MINUS T_MULT T_DIV T_LEQ T_LE T_GEQ T_GE T_EQ T_OR T_AND T_NOT T_EQUAL T_IF T_ELSE T_THEN T_FUN T_ARROW T_LET T_IN T_WHERE
 
-%right T_EQUAL T_ARROW
-%right T_LET T_FUN T_IF T_THEN 
-%right T_ELSE
+%nonassoc T_EQUAL T_ARROW T_LET T_FUN T_IF T_THEN T_WHERE T_IN T_ELSE
+%left  T_LEQ T_LE T_GE T_GEQ T_EQ
+%left T_OR 
+%left T_AND
+%nonassoc T_NOT
 %left T_PLUS T_MINUS
 %left T_MULT T_DIV
-%right  T_LEQ T_LE T_GE T_GEQ T_OR T_AND T_NOT T_EQ
 
-%type<expr> e arg_list
+%type<expr> e arg_list 
 %type<env> en
 	
 %%
@@ -66,22 +67,18 @@ e   :T_NUM                                                          {$$ = mk_int
 	|e T_EQ e                                                       {$$ = mk_app(mk_app(mk_op(EQ),$1),$3) ;}
 	|T_NOT e[expr]                                                  {$$ = mk_app(mk_op(NOT),$expr) ;}
     |T_FUN T_ID[var] arg_list[expr]                                 {$$ = mk_fun($var,$expr);env = push_rec_env($var,$$,env);}                    
-	|T_LET T_ID[x] T_EQUAL e[arg] T_IN e[exp]		            	{$$ = mk_app(mk_fun($x,$exp),$arg) ;}
-	|e[exp] T_WHERE T_ID[x] T_EQUAL e[arg]			            	{$$ = mk_app(mk_fun($x,$exp),$arg) ;}
+	|T_LET T_ID[x] T_EQUAL e[arg] T_IN e[exp]		            	{$$ = mk_app(mk_fun($x,$exp),$arg); env = push_rec_env($x,$$,env);}
+	|e[exp] T_WHERE T_ID[x] T_EQUAL e[arg]			            	{$$ = mk_app(mk_fun($x,$exp),$arg); env = push_rec_env($x,$$,env);}
 	|T_IF e[cond] T_THEN e[then_br] T_ELSE e[else_br]               {$$ = mk_cond($cond, $then_br, $else_br) ;}
-    |e[fun] e[arg]                                                  {$$ = mk_app($fun,$arg);}
+    |'(' e[fun] e[arg] ')'                                           {$$ = mk_app($fun,$arg);}
     |'(' e ')'                                                      {$$ = $2;}
     ;
+
 
 
 arg_list:T_ARROW e                                                  {$$=$2;}
         |T_ID[var] arg_list                                         {$$=mk_fun ($1, $2); env = push_rec_env($var,$$,env);}
         ;
-
-/*apli       :apli[fun] e[arg]                                           {$$ = mk_app($fun,$arg);}
-           |e                                                          {$$ = $1;}
-           ;
-*/
 
 %%
 
