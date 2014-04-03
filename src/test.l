@@ -31,6 +31,7 @@
 "let" return T_LET;
 "in" return T_IN;
 "where" return T_WHERE;
+"list" return T_LIST;
 
 [[:space:]] ;
 [[:digit:]]+ {yylval.num = atoi(yytext); return T_NUM;}

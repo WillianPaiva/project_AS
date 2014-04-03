@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "../interface/expr.h"
 
+
 struct expr *mk_node(void){
   struct expr *e = malloc(sizeof(struct expr));
   e->expr = malloc(sizeof(union node));
@@ -53,4 +54,14 @@ struct expr *mk_cond(struct expr *cond, struct expr *then_br, struct expr *else_
   e->expr->cond.then_br = then_br;
   e->expr->cond.else_br = else_br;
   return e;
+}
+
+
+struct expr *mk_cell(struct expr* exp, struct expr* next){
+  struct expr* e = mk_node();
+  e->type = CELL;
+  e->expr->cell.ex = expr;
+  e->expr->cell.next = next;
+  return e;
+  
 }
