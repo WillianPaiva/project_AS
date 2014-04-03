@@ -9,6 +9,7 @@
 
 %%
 
+"print\""(.)*"\"" {yylval.id = strdup (yytext+5); return T_PRINT; }
 "->" return T_ARROW;
 "+" return T_PLUS;
 "-" return T_MINUS;
