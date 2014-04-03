@@ -9,7 +9,7 @@ LDLIBS=-lm -lfl -ly
 CFLAGS=-std=c99 -g -pedantic -Wall -Wextra -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes 
 
 %.tab.c : %.y
-	$(YACC) $(YFLAGS) -o $@ $<
+	$(YACC) $(YFLAGS)  -o $@ $<
 
 %.tab.o : %.tab.c
 	$(CC) -c -o $@ $<
