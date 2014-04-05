@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "test.tab.h"
+#include "parser.tab.h"
 
         
 %}
