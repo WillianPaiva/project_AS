@@ -72,7 +72,7 @@ e   :T_NUM                                                          {$$ = mk_int
 	|T_NOT e[expr]                                                  {$$ = mk_app(mk_op(NOT),$expr) ;}
         |T_FUN T_ID[var] arg_list[expr]                                 {$$ = mk_fun($var,$expr);env = push_rec_env($var,$$,env);} 
 
-        |'['e[x]']'                                              {mk_app(mk_op(HEAD),$x);}
+|'['e[x]']'                                              {mk_app(mk_cell($x,mk_nil()));}
  
         |T_LET T_ID[x] T_EQUAL e[arg] T_IN e[exp]		        {$$ = mk_app(mk_fun($x,$exp),$arg); env = push_rec_env($x,$$,env);}
         |e[exp] T_WHERE T_ID[x] T_EQUAL e[arg]			        {$$ = mk_app(mk_fun($x,$exp),$arg); env = push_rec_env($x,$$,env);}
