@@ -11,7 +11,7 @@
 
 %%
 
-"print\""(.)*/["] {yylval.id  = strdup(yytext+6); return T_PRINT;}
+"print\""(.)*"\"" {yylval.id  = strdup(yytext+6); return T_PRINT;}
 "->" return T_ARROW;
 "+" return T_PLUS;
 "-" return T_MINUS;
