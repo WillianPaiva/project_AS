@@ -32,6 +32,10 @@
 "in" return T_IN;
 "where" return T_WHERE;
 "list" return T_LIST;
+"head" return T_HEAD;
+"tail" return T_TAIL;
+"hd" return T_HEAD;
+"tl" return T_TAIL;
 
 [[:space:]] ;
 [[:digit:]]+ {yylval.num = atoi(yytext); return T_NUM;}

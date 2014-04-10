@@ -65,3 +65,10 @@ struct expr *mk_cell(struct expr* exp, struct expr* next){
   return e;
   
 }
+
+struct expr * mk_nil(){
+  struct expr* e = mk_node();
+  e->type = NIL;
+  e->expr = NULL;
+  return e;
+}

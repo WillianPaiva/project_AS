@@ -4,10 +4,21 @@
 #include <stdio.h>
 #include <assert.h>
 #include "../interface/machine.h"
+#include "../interface/list.h"
 
 #define MAX_CLOSURE 1000000
 
 int nb_closure;
+
+int get_num(struct closure *cl){
+  int res =  cl->expr->expr->num;
+  return res;
+} 
+
+struct cell get_cell(struct closure * cl){
+  assert(cl->expr->type == CELL);
+  return cl->expr->expr->cell;
+}
 
 struct closure *mk_closure(struct expr *expr, struct env *env){
   assert(nb_closure<MAX_CLOSURE);
@@ -75,7 +86,7 @@ void step(struct configuration *conf){
   assert(expr!=NULL);
   switch (expr->type){
   case FUN: 
-    {// printf("fun\n");
+    {
       if(stack==NULL){return;}
       char *var = expr->expr->fun.id;
       struct expr *body = expr->expr->fun.body;
@@ -92,7 +103,7 @@ void step(struct configuration *conf){
       conf->stack = push_stack(mk_closure(arg,env),conf->stack);
       return step(conf);
     }
-  case ID: //printf("id: %s\n", expr->expr->id);
+  case ID: 
     assert(env!=NULL);
     conf->closure = search_env(expr->expr->id,env);
     return step(conf);
@@ -106,16 +117,20 @@ void step(struct configuration *conf){
       assert(conf->closure->expr->type==NUM);
       conf->stack=stack;
       if(conf->closure->expr->expr->num==0){
-        //printf("cond false\n");
+        
         conf->closure = mk_closure(expr->expr->cond.else_br,env);
       }
       else{
-        //printf("cond false\n");
+        
         conf->closure = mk_closure(expr->expr->cond.then_br,env);
       }
       return step(conf);
     }
   case NUM: 
+    return;
+  case NIL:
+    return;
+  case CELL:
     return;
   case OP: 
     {
@@ -123,40 +138,149 @@ void step(struct configuration *conf){
      if(stack==NULL){return;}
      struct closure *arg1 = stack->closure;
      stack = pop_stack(stack);
-     conf->closure = arg1;
-     conf->stack = NULL;
-     step(conf);
-     if(conf->closure->expr->type!=NUM){exit(EXIT_FAILURE);}
-     int k1 = conf->closure->expr->expr->num;
-     if(expr->expr->op==NOT){
-       conf->closure->expr->expr->num = !k1;
+     struct expr *e1 = conf->closure->expr;
+     switch(expr->expr->op){
+     case NOT:     
+       conf->closure = arg1;
+       conf->stack = NULL;
+       step(conf);
+       conf->closure->expr->expr->num = !get_num(conf->closure);
+       return;
+     case HEAD:
+       conf->closure = arg1;
+       conf->stack = NULL;
+       step(conf);
+       conf->closure->expr = get_cell(conf->closure).ex;
+       conf->stack=stack;
+       step(conf);
+       return;
+     case TAIL:
+       conf->closure = arg1;
+       conf->stack = NULL;
+       step(conf);
+       conf->closure->expr = get_cell(conf->closure).next;
+       conf->stack=stack;
+       step(conf);
        return;
      }
      if(stack==NULL){return;}
-     arg1=conf->closure;
      struct closure *arg2 = stack->closure;
      stack = pop_stack(stack);
-     conf->closure = arg2;
-     conf->stack=NULL;
-     step(conf);
-     if(conf->closure->expr->type!=NUM){exit(EXIT_FAILURE);}
-     int k2 = conf->closure->expr->expr->num;
+     struct expr *e2 = conf->closure->expr;
+     int k1,k2;
      switch (expr->expr->op){
-     case PLUS: //printf("plus\n");
+     case PLUS: 
+       conf->closure = arg1;
+       conf->stack=NULL;
+       step(conf);
+       k1 = get_num(conf->closure);
+       conf->closure = arg2;
+       conf->stack=NULL;
+       step(conf);
+       k2 = get_num(conf->closure);
        conf->closure = mk_closure(mk_int(k1+k2),NULL);return;
-     case MINUS: //printf("minus\n");
+     case MINUS: 
+       conf->closure = arg1;
+       conf->stack=NULL;
+       step(conf);
+       k1 = get_num(conf->closure);
+       conf->closure = arg2;
+       conf->stack=NULL;
+       step(conf);
+       k2 = get_num(conf->closure);
        conf->closure = mk_closure(mk_int(k1-k2),NULL);return;
-     case MULT: //printf("mult\n");
+     case MULT: 
+       conf->closure = arg1;
+       conf->stack=NULL;
+       step(conf);
+       k1 = get_num(conf->closure);
+       conf->closure = arg2;
+       conf->stack=NULL;
+       step(conf);
+       k2 = get_num(conf->closure);
        conf->closure = mk_closure(mk_int(k1*k2),NULL);return;
-     case DIV: assert(k2!=0); conf->closure =  mk_closure(mk_int(k1/k2),NULL);return;
-     case LEQ: //printf("%d <= %d \n",k1,k2);
+     case DIV:  
+       conf->closure = arg1;
+       conf->stack=NULL;
+       step(conf);
+       k1 = get_num(conf->closure);
+       conf->closure = arg2;
+       conf->stack=NULL;
+       step(conf);
+       k2 = get_num(conf->closure);
+       assert(k2!=0);
+       conf->closure =  mk_closure(mk_int(k1/k2),NULL);return;
+     case LEQ: 
+       conf->closure = arg1;
+       conf->stack=NULL;
+       step(conf);
+       k1 = get_num(conf->closure);
+       conf->closure = arg2;
+       conf->stack=NULL;
+       step(conf);
+       k2 = get_num(conf->closure);
        conf->closure = mk_closure(mk_int(k1 <= k2),NULL); return;
-     case LE: conf->closure = mk_closure(mk_int(k1 < k2),NULL); return;
-     case GEQ: conf->closure = mk_closure(mk_int(k1 >= k2),NULL); return;
-     case GE: conf->closure = mk_closure(mk_int(k1 > k2),NULL); return;
-     case EQ: conf->closure = mk_closure(mk_int(k1 == k2),NULL); return;
-     case OR: conf->closure = mk_closure(mk_int(k1 || k2),NULL); return;
-     case AND: conf->closure = mk_closure(mk_int(k1 && k2),NULL); return;
+     case LE: 
+       conf->closure = arg1;
+       conf->stack=NULL;
+       step(conf);
+       k1 = get_num(conf->closure);
+       conf->closure = arg2;
+       conf->stack=NULL;
+       step(conf);
+       k2 = get_num(conf->closure);
+       conf->closure = mk_closure(mk_int(k1 < k2),NULL); return;
+     case GEQ:
+       conf->closure = arg1;
+       conf->stack=NULL;
+       step(conf);
+       k1 = get_num(conf->closure);
+       conf->closure = arg2;
+       conf->stack=NULL;
+       step(conf);
+       k2 = get_num(conf->closure);
+       conf->closure = mk_closure(mk_int(k1 >= k2),NULL); return;
+     case GE: 
+       conf->closure = arg1;
+       conf->stack=NULL;
+       step(conf);
+       k1 = get_num(conf->closure);
+       conf->closure = arg2;
+       conf->stack=NULL;
+       step(conf);
+       k2 = get_num(conf->closure);
+       conf->closure = mk_closure(mk_int(k1 > k2),NULL); return;
+     case EQ: 
+       conf->closure = arg1;
+       conf->stack=NULL;
+       step(conf);
+       k1 = get_num(conf->closure);
+       conf->closure = arg2;
+       conf->stack=NULL;
+       step(conf);
+       k2 = get_num(conf->closure);
+       conf->closure = mk_closure(mk_int(k1 == k2),NULL); return;
+     case OR: 
+       conf->closure = arg1;
+       conf->stack=NULL;
+       step(conf);
+       k1 = get_num(conf->closure);
+       conf->closure = arg2;
+       conf->stack=NULL;
+       step(conf);
+       k2 = get_num(conf->closure);
+       conf->closure = mk_closure(mk_int(k1 || k2),NULL); return;
+     case AND: 
+       conf->closure = arg1;
+       conf->stack=NULL;
+       step(conf);
+       k1 = get_num(conf->closure);
+       conf->closure = arg2;
+       conf->stack=NULL;
+       step(conf);
+       k2 = get_num(conf->closure);
+       conf->closure = mk_closure(mk_int(k1 && k2),NULL); return;
+     case CONS: conf->closure = mk_closure(mk_cell(arg1->expr,arg2->expr),arg1->env);return;
      default: assert(0);
      }   
    }
