@@ -92,6 +92,8 @@ e   :
         |e[exp] T_WHERE T_ID[x] T_EQUAL e[arg]			    {$$ = mk_app(mk_fun($x,$exp),$arg); env = push_rec_env($x,$$,env);}
 /*Conditionnelle*/
 	|T_IF e[cond] T_THEN e[then_br] T_ELSE e[else_br]           {$$ = mk_cond($cond, $then_br, $else_br) ;}
+		|'['e[x]']'                                              {mk_app(mk_cell($x,mk_nil()));}
+
 /*Exécution de fonctions à plusieurs variables*/
         |'(' f_arg[fun] e[arg] ')'                                  {$$ = mk_app($fun,$arg);}
 /*Ignorer les parentheses inutiles*/
