@@ -2,13 +2,16 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "test.tab.h"
+#include "parser.tab.h"
+
+
 
         
 %}
 
 %%
 
+"print\""(.)*"\"" {yylval.id  = strdup(yytext+6); return T_PRINT;}
 "->" return T_ARROW;
 "+" return T_PLUS;
 "-" return T_MINUS;
@@ -40,5 +43,5 @@
 [[:space:]] ;
 [[:digit:]]+ {yylval.num = atoi(yytext); return T_NUM;}
 [a-zA-z]+    {yylval.id = strdup (yytext); return T_ID;}
-[()]            return yytext[0];
+[(),]            return yytext[0];
 .               {ECHO; yyerror ("unexpected character");}

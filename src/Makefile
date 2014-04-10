@@ -38,4 +38,4 @@ machine.o : machine.c
 
 .PHONY: clean
 clean:
-	rm -f *.o *.result *.out core
+	rm -f *.o *.result *.out *~ core
