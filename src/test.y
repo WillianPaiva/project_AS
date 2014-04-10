@@ -56,8 +56,8 @@ s       :s e[expr] FIN_EXPR {conf->closure = mk_closure($expr,env); conf->stack=
 en  :T_LET T_ID[x] T_EQUAL e[expr]                                  {$$ = push_rec_env($x,$expr,env);}
     ;
 	
-e   :T_NUM                                                          {$$ = mk_int($1);}   
-        |e T_PLUS e                                                     {$$ = mk_app(mk_app(mk_op(PLUS),$1),$3);}
+e   :T_NUM                                                          {$$ = mk_int($1);}        
+	|e T_PLUS e                                                     {$$ = mk_app(mk_app(mk_op(PLUS),$1),$3);}
 	|e T_MINUS e                                                    {$$ = mk_app(mk_app(mk_op(MINUS),$1),$3);}
 	|e T_DIV e                                                      {$$ = mk_app(mk_app(mk_op(DIV),$1),$3);}
 	|e T_MULT e                                                     {$$ = mk_app(mk_app(mk_op(MULT),$1),$3);}
