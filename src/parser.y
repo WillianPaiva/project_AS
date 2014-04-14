@@ -28,7 +28,7 @@
 /*Tokens utilisés*/
 %token<num>T_NUM
 %token<id>T_ID T_PRINT
-%token FIN_EXPR T_PLUS T_MINUS T_MULT T_DIV T_LEQ T_LE T_GEQ T_GE T_EQ T_OR T_AND T_NOT T_EQUAL T_IF T_ELSE T_THEN T_FUN T_ARROW T_LET T_IN T_WHERE T_LIST T_TAIL T_HEAD
+%token FIN_EXPR T_PLUS T_MINUS T_MULT T_DIV T_LEQ T_LE T_GEQ T_GE T_EQ T_OR T_AND T_NOT T_EQUAL T_IF T_ELSE T_THEN T_FUN T_ARROW T_LET T_IN T_WHERE T_LIST T_TAIL T_HEAD T_CONS
 
 
  /*Priorités nécessaires*/
@@ -60,7 +60,7 @@ s       :s e[expr] FIN_EXPR {conf->closure = mk_closure($expr,env); conf->stack=
 ;
 
 /*Variable d'environnement lors de l'affectation de variables*/                                      
-en  :T_LET T_ID[x] T_EQUAL e[expr]                                  {$$ = push_rec_env($x,$expr,env);}
+en  :T_LET T_ID[x] T_EQUAL e[expr]                                  {$$ = push_rec_env($x,$expr,env);print_env(env);}
     ;
 
 /*Expressions régulières*/
@@ -95,7 +95,12 @@ e   :
 /*Conditionnelle*/
 	|T_IF e[cond] T_THEN e[then_br] T_ELSE e[else_br]           {$$ = mk_cond($cond, $then_br, $else_br) ;}
 /*OP sur Listes*/
-	|'['list[l]']'                                              {$$ = $l;}
+	|'[' list[l] ']'                                            {$$ = $l;}
+        |T_HEAD e[l]                                                {$$ = mk_app(mk_op(HEAD),$l);}
+        |T_TAIL e[l]                                                {$$ = mk_app(mk_op(HEAD),$l);}
+        |T_CONS e[exp] e[l]                                         {$$ = mk_app(mk_app(mk_op(CONS),$l),$exp);}
+/*show list*/
+        |T_LIST e[l]                                                {}
 
 /*Exécution de fonctions à plusieurs variables*/
         |'(' f_arg[fun] e[arg] ')'                                  {$$ = mk_app($fun,$arg);}
@@ -115,9 +120,9 @@ arg_list:T_ARROW e                                                  {$$=$2;}
         ;
 
 list:
-/*empty*/ {$$=mk_nil();}
-|e[ex]    {$$=mk_cell($ex,mk_nil());}
+e[ex]    {$$=mk_cell($ex,mk_nil());}
 |list[l] ',' e[ex] {$$=mk_cell($ex,$l);}
+|/*empty*/ {$$=mk_nil();}
 ;
 
 %%

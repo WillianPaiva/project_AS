@@ -39,6 +39,7 @@
 "tail" return T_TAIL;
 "hd" return T_HEAD;
 "tl" return T_TAIL;
+"cons" return T_CONS;
 
 [[:space:]] ;
 [[:digit:]]+ {yylval.num = atoi(yytext); return T_NUM;}

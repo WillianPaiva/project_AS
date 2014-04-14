@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <assert.h>
 #include "../interface/machine.h"
-#include "../interface/list.h"
 
 #define MAX_CLOSURE 1000000
 
@@ -14,6 +13,12 @@ int get_num(struct closure *cl){
   int res =  cl->expr->expr->num;
   return res;
 } 
+
+void eval_arg(struct configuration *conf, struct closure *arg){
+  conf->closure = arg;
+  conf->stack = NULL;
+  step(conf);
+}
 
 struct cell get_cell(struct closure * cl){
   assert(cl->expr->type == CELL);
@@ -140,24 +145,18 @@ void step(struct configuration *conf){
      stack = pop_stack(stack);
      struct expr *e1 = conf->closure->expr;
      switch(expr->expr->op){
-     case NOT:     
-       conf->closure = arg1;
-       conf->stack = NULL;
-       step(conf);
+     case NOT: 
+       eval_arg(conf,arg1);
        conf->closure->expr->expr->num = !get_num(conf->closure);
        return;
      case HEAD:
-       conf->closure = arg1;
-       conf->stack = NULL;
-       step(conf);
+       eval_arg(conf,arg1);
        conf->closure->expr = get_cell(conf->closure).ex;
        conf->stack=stack;
        step(conf);
        return;
      case TAIL:
-       conf->closure = arg1;
-       conf->stack = NULL;
-       step(conf);
+       eval_arg(conf,arg1);
        conf->closure->expr = get_cell(conf->closure).next;
        conf->stack=stack;
        step(conf);
@@ -170,117 +169,75 @@ void step(struct configuration *conf){
      int k1,k2;
      switch (expr->expr->op){
      case PLUS: 
-       conf->closure = arg1;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg1);
        k1 = get_num(conf->closure);
-       conf->closure = arg2;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg2);
        k2 = get_num(conf->closure);
        conf->closure = mk_closure(mk_int(k1+k2),NULL);return;
      case MINUS: 
-       conf->closure = arg1;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg1);
        k1 = get_num(conf->closure);
-       conf->closure = arg2;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg2);
        k2 = get_num(conf->closure);
        conf->closure = mk_closure(mk_int(k1-k2),NULL);return;
      case MULT: 
-       conf->closure = arg1;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg1);
        k1 = get_num(conf->closure);
-       conf->closure = arg2;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg2);
        k2 = get_num(conf->closure);
        conf->closure = mk_closure(mk_int(k1*k2),NULL);return;
      case DIV:  
-       conf->closure = arg1;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg1);
        k1 = get_num(conf->closure);
-       conf->closure = arg2;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg2);
        k2 = get_num(conf->closure);
        assert(k2!=0);
        conf->closure =  mk_closure(mk_int(k1/k2),NULL);return;
      case LEQ: 
-       conf->closure = arg1;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg1);
        k1 = get_num(conf->closure);
-       conf->closure = arg2;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg2);
        k2 = get_num(conf->closure);
        conf->closure = mk_closure(mk_int(k1 <= k2),NULL); return;
      case LE: 
-       conf->closure = arg1;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg1);
        k1 = get_num(conf->closure);
-       conf->closure = arg2;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg2);
        k2 = get_num(conf->closure);
        conf->closure = mk_closure(mk_int(k1 < k2),NULL); return;
      case GEQ:
-       conf->closure = arg1;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg1);
        k1 = get_num(conf->closure);
-       conf->closure = arg2;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg2);
        k2 = get_num(conf->closure);
        conf->closure = mk_closure(mk_int(k1 >= k2),NULL); return;
      case GE: 
-       conf->closure = arg1;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg1);
        k1 = get_num(conf->closure);
-       conf->closure = arg2;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg2);
        k2 = get_num(conf->closure);
        conf->closure = mk_closure(mk_int(k1 > k2),NULL); return;
      case EQ: 
-       conf->closure = arg1;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg1);
        k1 = get_num(conf->closure);
-       conf->closure = arg2;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg2);
        k2 = get_num(conf->closure);
        conf->closure = mk_closure(mk_int(k1 == k2),NULL); return;
      case OR: 
-       conf->closure = arg1;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg1);
        k1 = get_num(conf->closure);
-       conf->closure = arg2;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg2);
        k2 = get_num(conf->closure);
        conf->closure = mk_closure(mk_int(k1 || k2),NULL); return;
      case AND: 
-       conf->closure = arg1;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg1);
        k1 = get_num(conf->closure);
-       conf->closure = arg2;
-       conf->stack=NULL;
-       step(conf);
+       eval_arg(conf,arg2);
        k2 = get_num(conf->closure);
        conf->closure = mk_closure(mk_int(k1 && k2),NULL); return;
-     case CONS: conf->closure = mk_closure(mk_cell(arg1->expr,arg2->expr),arg1->env);return;
+     case CONS: 
+       conf->closure = mk_closure(mk_cell(arg1->expr,arg2->expr),arg1->env);
+       return;
      default: assert(0);
      }   
    }
