@@ -28,17 +28,17 @@
 /*Tokens utilisés*/
 %token<num>T_NUM
 %token<id>T_ID T_PRINT
-%token FIN_EXPR T_PLUS T_MINUS T_MULT T_DIV T_LEQ T_LE T_GEQ T_GE T_EQ T_OR T_AND T_NOT T_EQUAL T_IF T_ELSE T_THEN T_FUN T_ARROW T_LET T_IN T_WHERE T_LIST T_NEXT T_POP T_PUSH
+%token FIN_EXPR T_PLUS T_MINUS T_MULT T_DIV T_LEQ T_LE T_GEQ T_GE T_EQ T_OR T_AND T_NOT T_EQUAL T_IF T_ELSE T_THEN T_FUN T_ARROW T_LET T_IN T_WHERE T_NEXT T_POP T_PUSH
 
 
  /*Priorités nécessaires*/
 %nonassoc T_EQUAL T_ARROW T_LET T_FUN T_IF T_THEN T_WHERE T_IN T_ELSE
 %left  T_LEQ T_LE T_GE T_GEQ T_EQ
 %left T_OR 
-%left T_AND
-%nonassoc T_NOT T_POP T_NEXT T_PUSH T_LIST
+%left T_AND 
+%nonassoc T_NOT T_POP T_NEXT
 %left T_PLUS T_MINUS
-%left T_MULT T_DIV
+%left T_MULT T_DIV T_PUSH
 
 /* Déclaration des types*/
 %type<expr> e arg_list f_arg list 
@@ -88,8 +88,7 @@ e   :    T_NUM                                             { $$ = mk_int($1);}
 	| e[exp] T_WHERE T_ID[x] T_EQUAL e[arg]            { $$ = mk_app(mk_fun($x,$exp),$arg); env = push_rec_env($x,$$,env);}/*Fonction WHERE*/
 	| T_IF e[cond] T_THEN e[then_br] T_ELSE e[else_br] { $$ = mk_cond($cond, $then_br, $else_br) ;}
 	| '[' list[l] ']'                                  { $$ = $l;}/*OP sur Listes*/
-	| e[exp] T_PUSH e[l]                               { $$ = mk_app(mk_app(mk_op(PUSH),$l),$exp);} 
-        | T_LIST e[l]                                      { $$ = $l;}/*show list*/
+| e[exp] T_PUSH e[l]                               { $$ = mk_app(mk_app(mk_op(PUSH),$exp),$l);} 
 	| '(' f_arg[fun] e[arg] ')'                        { $$ = mk_app($fun,$arg);}/*Exécution de fonctions à plusieurs variables*/
 	| '(' e ')'                                        { $$ = $2;}/*Ignorer les parentheses inutiles*/
     ;

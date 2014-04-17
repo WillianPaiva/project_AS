@@ -34,7 +34,6 @@
 "let" return T_LET;
 "in" return T_IN;
 "where" return T_WHERE;
-"list" return T_LIST;
 "pop" return T_POP;
 "tail" return T_NEXT;
 "next" return T_NEXT;

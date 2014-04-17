@@ -70,10 +70,9 @@ extern int yydebug;
     T_LET = 280,
     T_IN = 281,
     T_WHERE = 282,
-    T_LIST = 283,
-    T_NEXT = 284,
-    T_POP = 285,
-    T_PUSH = 286
+    T_NEXT = 283,
+    T_POP = 284,
+    T_PUSH = 285
   };
 #endif
 
@@ -89,7 +88,7 @@ union YYSTYPE
   struct expr *expr;
   struct env *env;
 
-#line 93 "parser.tab.h" /* yacc.c:1909  */
+#line 92 "parser.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
