@@ -151,15 +151,13 @@ void step(struct configuration *conf){
        return;
      case POP:
        eval_arg(conf,arg1);
-       conf->closure->expr = get_cell(conf->closure).ex;
+       conf->closure = mk_closure(get_cell(conf->closure).ex,conf->closure->env);
        conf->stack=stack;
        step(conf);
        return;
      case NEXT:
        eval_arg(conf,arg1);
-       conf->closure->expr = get_cell(conf->closure).next;
-       conf->stack=stack;
-       step(conf);
+       conf->closure = mk_closure(get_cell(conf->closure).next,conf->closure->env);
        return;
      }
      if(stack==NULL){return;}

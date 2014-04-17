@@ -106,7 +106,7 @@ arg_list:T_ARROW e                                                  {$$=$2;}
         ;
 
 list	: e[ex]					{$$ = mk_cell($ex,mk_nil());}
-		| list[l] ',' e[ex]		{$$ = mk_cell($ex,$l);}
+		| e[ex] ',' list[l]		{$$ = mk_cell($ex,$l);}
 		|	     				{$$ = mk_nil();}
 		;
 
