@@ -91,8 +91,7 @@ e   :T_NUM                                             { $$ = mk_int($1);}
 	| T_CONS e[exp] e[l]                               { $$ = mk_app(mk_app(mk_op(CONS),$l),$exp);} /*show list*/
 	| '(' f_arg[fun] e[arg] ')'                        { $$ = mk_app($fun,$arg);}/*Exécution de fonctions à plusieurs variables*/
 	| '(' e ')'                                        { $$ = $2;}/*Ignorer les parentheses inutiles*/
-
-        ;
+    ;
 /*Boucle pour plusieurs paramtres d'une fonction*/
 f_arg :e                                                            {$$ = $1;}
       |f_arg[fun] e[arg]                                            {$$ = mk_app($fun,$arg);}
