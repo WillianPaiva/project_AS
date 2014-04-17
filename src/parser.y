@@ -36,7 +36,7 @@
 %left  T_LEQ T_LE T_GE T_GEQ T_EQ
 %left T_OR 
 %left T_AND
-%nonassoc T_NOT T_HEAD T_TAIL
+%nonassoc T_NOT T_HEAD T_TAIL T_CONS
 %left T_PLUS T_MINUS
 %left T_MULT T_DIV
 
@@ -88,7 +88,7 @@ e   :T_NUM                                             { $$ = mk_int($1);}
 	| e[exp] T_WHERE T_ID[x] T_EQUAL e[arg]            { $$ = mk_app(mk_fun($x,$exp),$arg); env = push_rec_env($x,$$,env);}/*Fonction WHERE*/
 	| T_IF e[cond] T_THEN e[then_br] T_ELSE e[else_br] { $$ = mk_cond($cond, $then_br, $else_br) ;}
 	| '[' list[l] ']'                                  { $$ = $l;}/*OP sur Listes*/
-/*	| T_CONS e[exp] e[l]                               { $$ = mk_app(mk_app(mk_op(CONS),$l),$exp);}*/ /*show list*/
+	| T_CONS e[exp] e[l]                               { $$ = mk_app(mk_app(mk_op(CONS),$l),$exp);} /*show list*/
 	| '(' f_arg[fun] e[arg] ')'                        { $$ = mk_app($fun,$arg);}/*Exécution de fonctions à plusieurs variables*/
 	| '(' e ')'                                        { $$ = $2;}/*Ignorer les parentheses inutiles*/
 
