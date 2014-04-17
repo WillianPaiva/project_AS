@@ -149,13 +149,13 @@ void step(struct configuration *conf){
        eval_arg(conf,arg1);
        conf->closure->expr->expr->num = !get_num(conf->closure);
        return;
-     case HEAD:
+     case POP:
        eval_arg(conf,arg1);
        conf->closure->expr = get_cell(conf->closure).ex;
        conf->stack=stack;
        step(conf);
        return;
-     case TAIL:
+     case NEXT:
        eval_arg(conf,arg1);
        conf->closure->expr = get_cell(conf->closure).next;
        conf->stack=stack;
@@ -235,7 +235,7 @@ void step(struct configuration *conf){
        eval_arg(conf,arg2);
        k2 = get_num(conf->closure);
        conf->closure = mk_closure(mk_int(k1 && k2),NULL); return;
-     case CONS: 
+     case PUSH: 
        conf->closure = mk_closure(mk_cell(arg1->expr,arg2->expr),arg1->env);
        return;
      default: assert(0);

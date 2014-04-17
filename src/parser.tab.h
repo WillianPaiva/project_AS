@@ -1,19 +1,19 @@
-/* A Bison parser, made by GNU Bison 2.7.12-4996.  */
+/* A Bison parser, made by GNU Bison 3.0.2.  */
 
 /* Bison interface for Yacc-like parsers in C
-   
-      Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
-   
+
+   Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
+
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
@@ -26,13 +26,13 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-   
+
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
 #ifndef YY_YY_PARSER_TAB_H_INCLUDED
 # define YY_YY_PARSER_TAB_H_INCLUDED
-/* Enabling traces.  */
+/* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 1
 #endif
@@ -40,76 +40,64 @@
 extern int yydebug;
 #endif
 
-/* Tokens.  */
+/* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum yytokentype {
-     T_NUM = 258,
-     T_ID = 259,
-     T_PRINT = 260,
-     FIN_EXPR = 261,
-     T_PLUS = 262,
-     T_MINUS = 263,
-     T_MULT = 264,
-     T_DIV = 265,
-     T_LEQ = 266,
-     T_LE = 267,
-     T_GEQ = 268,
-     T_GE = 269,
-     T_EQ = 270,
-     T_OR = 271,
-     T_AND = 272,
-     T_NOT = 273,
-     T_EQUAL = 274,
-     T_IF = 275,
-     T_ELSE = 276,
-     T_THEN = 277,
-     T_FUN = 278,
-     T_ARROW = 279,
-     T_LET = 280,
-     T_IN = 281,
-     T_WHERE = 282,
-     T_LIST = 283
-   };
+  enum yytokentype
+  {
+    T_NUM = 258,
+    T_ID = 259,
+    T_PRINT = 260,
+    FIN_EXPR = 261,
+    T_PLUS = 262,
+    T_MINUS = 263,
+    T_MULT = 264,
+    T_DIV = 265,
+    T_LEQ = 266,
+    T_LE = 267,
+    T_GEQ = 268,
+    T_GE = 269,
+    T_EQ = 270,
+    T_OR = 271,
+    T_AND = 272,
+    T_NOT = 273,
+    T_EQUAL = 274,
+    T_IF = 275,
+    T_ELSE = 276,
+    T_THEN = 277,
+    T_FUN = 278,
+    T_ARROW = 279,
+    T_LET = 280,
+    T_IN = 281,
+    T_WHERE = 282,
+    T_LIST = 283,
+    T_NEXT = 284,
+    T_POP = 285,
+    T_PUSH = 286
+  };
 #endif
 
-
+/* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE
+typedef union YYSTYPE YYSTYPE;
+union YYSTYPE
 {
-/* Line 2053 of yacc.c  */
-#line 21 "parser.y"
+#line 21 "parser.y" /* yacc.c:1909  */
 
   char* id;
   int num;
   struct expr *expr;
   struct env *env;
 
-
-/* Line 2053 of yacc.c  */
-#line 93 "parser.tab.h"
-} YYSTYPE;
+#line 93 "parser.tab.h" /* yacc.c:1909  */
+};
 # define YYSTYPE_IS_TRIVIAL 1
-# define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 #endif
 
+
 extern YYSTYPE yylval;
 
-#ifdef YYPARSE_PARAM
-#if defined __STDC__ || defined __cplusplus
-int yyparse (void *YYPARSE_PARAM);
-#else
-int yyparse ();
-#endif
-#else /* ! YYPARSE_PARAM */
-#if defined __STDC__ || defined __cplusplus
 int yyparse (void);
-#else
-int yyparse ();
-#endif
-#endif /* ! YYPARSE_PARAM */
 
 #endif /* !YY_YY_PARSER_TAB_H_INCLUDED  */

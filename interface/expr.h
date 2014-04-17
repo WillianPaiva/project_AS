@@ -1,7 +1,7 @@
 
 enum expr_kind {ID, FUN, APP, NUM, OP, COND, CELL,NIL};
 
-enum op{PLUS, MINUS, MULT, DIV, LEQ, LE, GEQ, GE, EQ, OR, AND, NOT, CONS, HEAD, TAIL};
+enum op{PLUS, MINUS, MULT, DIV, LEQ, LE, GEQ, GE, EQ, OR, AND, NOT, PUSH, POP, NEXT};
 
 struct expr;
 

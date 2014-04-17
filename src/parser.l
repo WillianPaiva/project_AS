@@ -35,11 +35,12 @@
 "in" return T_IN;
 "where" return T_WHERE;
 "list" return T_LIST;
-"head" return T_HEAD;
-"tail" return T_TAIL;
-"hd" return T_HEAD;
-"tl" return T_TAIL;
-"cons" return T_CONS;
+"pop" return T_POP;
+"tail" return T_NEXT;
+"next" return T_NEXT;
+"hd" return T_POP;
+"tl" return T_NEXT;
+"::" return T_PUSH;
 [(),\[\]]            return yytext[0];
 [[:space:]] ;
 [[:digit:]]+ {yylval.num = atoi(yytext); return T_NUM;}
