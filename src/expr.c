@@ -57,11 +57,20 @@ struct expr *mk_cond(struct expr *cond, struct expr *then_br, struct expr *else_
 }
 
 
-struct expr *mk_cell(struct expr* exp, struct expr* next){
+struct expr *mk_cell(struct expr* expr, struct expr* next){
   struct expr* e = mk_node();
   e->type = CELL;
-  e->expr->cell.ex = exp;
+  e->expr->cell.ex = expr;
   e->expr->cell.next = next;
+  return e;
+  
+}
+
+struct expr *mk_point(struct expr* x, struct expr* y){
+  struct expr* e = mk_node();
+  e->type = POINT;
+  e->expr->point.x = x;
+  e->expr->point.y = y;
   return e;
   
 }

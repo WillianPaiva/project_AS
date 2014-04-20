@@ -67,9 +67,10 @@ en  :T_LET T_ID[x] T_EQUAL e[expr]                                  {$$ = push_r
 
 
 /*Reconnaissance d'entiers*/
-e   :    T_NUM                                             { $$ = mk_int($1);}
-	| T_POP e[l]					   { $$ = mk_app(mk_op(POP),$l);}
-	| T_NEXT e[l]					   { $$ = mk_app(mk_op(NEXT),$l);}
+e   :    T_NUM                                         { $$ = mk_int($1);}
+	| T_POP e[l]									   { $$ = mk_app(mk_op(POP),$l);}
+	| T_NEXT e[l]					                   { $$ = mk_app(mk_op(NEXT),$l);}
+	| "{" e[x] "," e[y] "}"							   { $$ = mk_point($x,$y);}
 	| e T_PLUS e                                       { $$ = mk_app(mk_app(mk_op(PLUS),$1),$3);}
 	| e T_MINUS e                                      { $$ = mk_app(mk_app(mk_op(MINUS),$1),$3);}
 	| e T_DIV e                                        { $$ = mk_app(mk_app(mk_op(DIV),$1),$3);}
