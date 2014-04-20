@@ -10,7 +10,6 @@
 %}
 
 %%
-
 "print\""(.)*"\"" {yylval.id  = strdup(yytext+6); return T_PRINT;}
 "->" return T_ARROW;
 "+" return T_PLUS;
@@ -40,7 +39,8 @@
 "hd" return T_POP;
 "tl" return T_NEXT;
 "::" return T_PUSH;
-[(),\[\]\{\}]            return yytext[0];
+
+[(),\[\]{}]         {return yytext[0];}
 [[:space:]] ;
 [[:digit:]]+ {yylval.num = atoi(yytext); return T_NUM;}
 [a-zA-z]+    {yylval.id = strdup (yytext); return T_ID;}
