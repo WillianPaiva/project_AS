@@ -137,7 +137,13 @@ void step(struct configuration *conf){
     return;
   case CELL:
     return;
-  case OP: 
+  case POINT:
+	return;
+  case PATH:
+	return;
+  case CIRCLE:
+	return;
+  case OP:
     {
      struct stack *stack = conf->stack;
      if(stack==NULL){return;}

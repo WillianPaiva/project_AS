@@ -1,5 +1,6 @@
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "../interface/expr.h"
 
 
@@ -71,18 +72,35 @@ struct expr *mk_point(struct expr* x, struct expr* y){
   e->type = POINT;
   e->expr->point.x = x;
   e->expr->point.y = y;
-  printf("WTF");
   return e;
   
 }
 
 struct expr *mk_path(struct expr* point, struct expr* next){
-  struct expr* e = mk_node();
-  e->type = PATH;
-  e->expr->path.point = point;
-  e->expr->path.next = next;
-  return e;
+  	struct expr* e;
+	
+	if(point->type == PATH){
+		if(point->expr->path.next){
+			e = point->expr->path.next;
+			while(e->expr->path.next){
+				e = e->expr->path.next;
+			}
+			e->expr->path.next = next;
+			return point;
+		}else{
+			
+			point->expr->path.next = next;
+			return point;
+		}
   
+  }else{
+	
+	  e = mk_node();
+	  e->type = PATH;
+	  e->expr->path.point = point;
+	  e->expr->path.next = next;
+	  return e;
+   }
 }
 
 struct expr *mk_circle(struct expr* center, struct expr* radius){

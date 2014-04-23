@@ -11,6 +11,8 @@
 
 %%
 "print\""(.)*"\"" {yylval.id  = strdup(yytext+6); return T_PRINT;}
+"Cercle" return T_CIRCLE;
+"--" return T_PATH;
 "->" return T_ARROW;
 "+" return T_PLUS;
 "-" return T_MINUS;

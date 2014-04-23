@@ -28,14 +28,14 @@
 /*Tokens utilisés*/
 %token<num>T_NUM
 %token<id>T_ID T_PRINT
-%token FIN_EXPR T_PLUS T_MINUS T_MULT T_DIV T_LEQ T_LE T_GEQ T_GE T_EQ T_OR T_AND T_NOT T_EQUAL T_IF T_ELSE T_THEN T_FUN T_ARROW T_LET T_IN T_WHERE T_NEXT T_POP T_PUSH 
+%token FIN_EXPR T_PLUS T_MINUS T_MULT T_DIV T_LEQ T_LE T_GEQ T_GE T_EQ T_OR T_AND T_NOT T_EQUAL T_IF T_ELSE T_THEN T_FUN T_ARROW T_LET T_IN T_WHERE T_NEXT T_POP T_PUSH T_PATH T_CIRCLE
 
 
  /*Priorités nécessaires*/
 %nonassoc T_EQUAL T_ARROW T_LET T_FUN T_IF T_THEN T_WHERE T_IN T_ELSE
 %left  T_LEQ T_LE T_GE T_GEQ T_EQ
 %left T_OR 
-%left T_AND 
+%left T_AND T_PATH
 %nonassoc T_NOT T_POP T_NEXT
 %left T_PLUS T_MINUS
 %left T_MULT T_DIV T_PUSH
@@ -67,10 +67,12 @@ en  :T_LET T_ID[x] T_EQUAL e[expr]                                  {$$ = push_r
 
 
 /*Reconnaissance d'entiers*/
-e   :    T_NUM                                         { $$ = mk_int($1);}
+e   : T_NUM                                            { $$ = mk_int($1);}
 	| T_POP e[l]									   { $$ = mk_app(mk_op(POP),$l);}
 	| T_NEXT e[l]					                   { $$ = mk_app(mk_op(NEXT),$l);}
-	| "{" e[x] "," e[y] "}"							   { $$ = mk_int($x);}
+	|'{' e[x] ',' e[y] '}'							   { $$ = mk_point($x,$y);}	
+	| T_CIRCLE '(' e[c] ',' e[r] ')'                   { $$ = mk_circle($c,$r);}
+	| e T_PATH e       					               { $$ = mk_path($1,mk_path($3,NULL));}
 	| e T_PLUS e                                       { $$ = mk_app(mk_app(mk_op(PLUS),$1),$3);}
 	| e T_MINUS e                                      { $$ = mk_app(mk_app(mk_op(MINUS),$1),$3);}
 	| e T_DIV e                                        { $$ = mk_app(mk_app(mk_op(DIV),$1),$3);}
@@ -94,6 +96,8 @@ e   :    T_NUM                                         { $$ = mk_int($1);}
 	| '(' e ')'                                        { $$ = $2;}/*Ignorer les parentheses inutiles*/
     ;
 /*Boucle pour plusieurs paramtres d'une fonction*/
+		
+
 f_arg :e                                                            {$$ = $1;}
       |f_arg[fun] e[arg]                                            {$$ = mk_app($fun,$arg);}
       ;
