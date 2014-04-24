@@ -112,6 +112,33 @@ struct expr *mk_circle(struct expr* center, struct expr* radius){
   
 }
 
+struct expr *mk_bezier(struct expr* point, struct expr* next){
+	 struct expr* e = mk_node();
+	if(point->type == BEZIER){
+		if(point->expr->bezier.next){
+			e = point->expr->bezier.next;
+			while(e->expr->bezier.next){
+				e = e->expr->bezier.next;
+			}
+			e->expr->bezier.next = next;
+			return point;
+		}else{
+			
+			point->expr->path.next = next;
+			return point;
+		}
+  
+  }else{
+
+	  e = mk_node();
+	  e->type = BEZIER;
+	  e->expr->bezier.pt1 = point;
+	  e->expr->bezier.next = next;
+	  return e;
+
+}
+
+}
 
 struct expr * mk_nil(){
   struct expr* e = mk_node();

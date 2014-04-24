@@ -1,5 +1,5 @@
 
-enum expr_kind {ID, FUN, APP, NUM, OP, COND, CELL, NIL, POINT, PATH, CIRCLE};
+enum expr_kind {ID, FUN, APP, NUM, OP, COND, CELL, NIL, POINT, PATH, CIRCLE,BEZIER};
 
 enum op{PLUS, MINUS, MULT, DIV, LEQ, LE, GEQ, GE, EQ, OR, AND, NOT, PUSH, POP, NEXT, DRAW};
 
@@ -8,6 +8,13 @@ struct expr;
 struct cell {
   struct expr* ex;
   struct expr* next;
+};
+
+struct bezier{
+	struct expr * pt1;
+	struct expr * next;
+
+
 };
 
 
@@ -58,6 +65,7 @@ union node{
   struct point point;
   struct path path;
   struct circle circle;
+  struct bezier bezier;
 
 };
 
@@ -78,6 +86,7 @@ struct expr *mk_point(struct expr *x, struct expr *y);
 struct expr *mk_nil(void);
 struct expr *mk_path(struct expr *point, struct expr *next);
 struct expr *mk_circle(struct expr *center, struct expr *radius);
+struct expr *mk_bezier(struct expr *point, struct expr *next);
 
 
 

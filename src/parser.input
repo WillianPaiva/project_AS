@@ -30,4 +30,11 @@ Draw(l--f--g);
 let p = {100,75};
 let y = Cercle(p,50);
 Draw(y);
+let p = {20,20};
+let t = {20,100};
+let u = {200,100};
+let g = {200,20};
+let b = Bezier(p,t,u,g);
+Draw(b);
+
 
