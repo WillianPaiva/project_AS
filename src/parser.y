@@ -63,7 +63,7 @@ s       :s e[expr] FIN_EXPR {conf->closure = mk_closure($expr,env); conf->stack=
  }
 |s en FIN_EXPR				   {env = $2;}
 |s T_PRINT FIN_EXPR			   {$2[strlen($2)-1] = 0;printf("%s\n",$2);}
-|s T_DRAW '(' e[d] ')' FIN_EXPR   {draw_path($d);}		
+|s T_DRAW '(' e[d] ')' FIN_EXPR   {conf->closure = mk_closure(mk_app(mk_op(DRAW),$d),env); conf->stack=NULL; step(conf); print_exp(conf);}	
 |
 ;
 

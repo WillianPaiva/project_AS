@@ -14,6 +14,8 @@ int get_num(struct closure *cl){
   return res;
 } 
 
+
+
 void eval_arg(struct configuration *conf, struct closure *arg){
   conf->closure = arg;
   conf->stack = NULL;
@@ -71,6 +73,12 @@ struct closure *search_env(char *id, struct env *env){
   else{return search_env(id,env->next);}  
 }
 
+
+struct expr *id(struct expr *id, struct env *env){
+	struct closure *cl =  search_env(id->expr->id,env);
+    return cl->expr;
+}
+
 struct stack *pop_stack(struct stack *stack){
   struct stack *next = stack->next;
   free(stack);
@@ -83,18 +91,19 @@ struct stack *push_stack(struct closure *cl, struct stack *stack){
   st->next = stack;
   return st;
 }
-void draw_path(struct expr * dr){
-	assert(dr->type == PATH);
-
-
+void draw_path(struct expr * dr, struct env * env){
+	char * name = "PATH.html";
 	FILE *f;
-	f = fopen("PATH.html","w");
+	f = fopen(name,"w");
 	if(f == NULL){	
-		f = fopen("PATH.html","wb");
-	}else if(f == NULL){	
-		printf("error opening file");
-		exit(1);
+		f = fopen(name,"wb");
 	}
+	struct expr *p1 = dr->expr->path.point;
+	if(p1->type == ID){
+		p1 = id(p1,env);	
+	}
+	int x = p1->expr->point.x->expr->num;
+    int y = p1->expr->point.y->expr->num;
 
 	
 	fprintf(f,"<!DOCTYPE HTML>\n");
@@ -106,10 +115,17 @@ void draw_path(struct expr * dr){
 	fprintf(f,"		if (canvas.getContext){\n");
 	fprintf(f,"			var ctx = canvas.getContext('2d');\n");
 	fprintf(f,"			ctx.beginPath();\n");
-	fprintf(f,"			ctx.moveTo(%d,%d);\n",dr->expr->path.point->expr->point.x->expr->num, dr->expr->path.point->expr->point.y->expr->num);
+	fprintf(f,"			ctx.moveTo(%d,%d);\n",x,y);
 	struct expr *next = dr->expr->path.next;
 	while(next){
-			fprintf(f,"			ctx.lineTo(%d,%d);\n",next->expr->path.point->expr->point.x->expr->num, next->expr->path.point->expr->point.y->expr->num);
+		p1 = next->expr->path.point;
+		if(p1->type == ID){
+			p1 = id(p1,env);	
+		}
+		x = p1->expr->point.x->expr->num;
+		y = p1->expr->point.y->expr->num;
+
+			fprintf(f,"			ctx.lineTo(%d,%d);\n",x,y);
 			next = next->expr->path.next;
 		
 	}	
@@ -125,7 +141,7 @@ void draw_path(struct expr * dr){
 	fprintf(f,"</body>\n");
 	fprintf(f,"</html>\n");
 	fclose(f);
-	printf("file PATH.html created !");
+	printf("file PATH.html created !\n");
 
 
 
@@ -134,19 +150,28 @@ void draw_path(struct expr * dr){
 
 }
 
-void draw_circle(struct expr * dr){
-	assert(dr->type == CIRCLE);
+void draw_circle(struct expr * dr,struct env *env){
+	char * name = "CIRCLE.html";
 	FILE *f;
-	f = fopen("CIRCLE.html","w");
+	f = fopen(name,"w");
 	if(f == NULL){	
-		f = fopen("CIRCLE.html","wb");
-	}else if(f == NULL){	
-		printf("error opening file");
-		exit(1);
+		f = fopen(name,"wb");
 	}
+	struct expr *p1 = dr->expr->circle.center;
+	if(p1->type == ID){
+		p1 = id(p1,env);	
+	}
+	struct expr *p3 = dr->expr->circle.radius;
+	if(p3->type == ID){
+		p3 = id(p3,env);	
+	}
+	int x = p1->expr->point.x->expr->num;
+    int y = p1->expr->point.y->expr->num;
+	int r = p3->expr->num;
 
 
-	
+
+
 	fprintf(f,"<!DOCTYPE HTML>\n");
 	fprintf(f,"<html>\n");
 	fprintf(f,"<head>\n");
@@ -156,7 +181,7 @@ void draw_circle(struct expr * dr){
 	fprintf(f,"		if (canvas.getContext){\n");
 	fprintf(f,"			var ctx = canvas.getContext('2d');\n");
 	fprintf(f,"			ctx.beginPath();\n");
-	fprintf(f,"			ctx.arc(%d,%d,%d,0,2*Math.PI);\n",dr->expr->circle.center->expr->point.x->expr->num,dr->expr->circle.center->expr->point.y->expr->num,dr->expr->circle.radius->expr->num);
+	fprintf(f,"			ctx.arc(%d,%d,%d,0,2*Math.PI);\n",x,y,r);
 	fprintf(f,"			ctx.stroke();\n");
 	fprintf(f,"		} else {\n");
 	fprintf(f,"			alert('You need Safari or Firefox 1.5+ to see this demo.');\n");  
@@ -169,7 +194,7 @@ void draw_circle(struct expr * dr){
 	fprintf(f,"</body>\n");
 	fprintf(f,"</html>\n");
 	fclose(f);
-	printf("file CIRCLE.html created !");
+	printf("file CIRCLE.html created !\n");
 
 
 
@@ -178,7 +203,21 @@ void draw_circle(struct expr * dr){
 }
 
 
+void drawing(struct expr * dr, struct env *env){
+	switch(dr->type){
+		case PATH:
+			draw_path(dr,env);
+			return;
+		case CIRCLE:
+			draw_circle(dr,env);
+			return;
+		default:
+			printf("not a drawble object\n");
+			return;
+	
+	}
 
+}
 
 
 
@@ -238,10 +277,8 @@ void step(struct configuration *conf){
   case POINT:
 	return;
   case PATH:
-	draw_path(expr);
 	return;
   case CIRCLE:
-	draw_circle(expr);
 	return;
   case OP:
     {
@@ -251,6 +288,10 @@ void step(struct configuration *conf){
      stack = pop_stack(stack);
      struct expr *e1 = conf->closure->expr;
      switch(expr->expr->op){
+	 case DRAW:
+		 eval_arg(conf,arg1);
+		 drawing(conf->closure->expr ,conf->closure->env);
+		 return;
      case NOT: 
        eval_arg(conf,arg1);
        conf->closure->expr->expr->num = !get_num(conf->closure);
