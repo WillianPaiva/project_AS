@@ -83,6 +83,104 @@ struct stack *push_stack(struct closure *cl, struct stack *stack){
   st->next = stack;
   return st;
 }
+void draw_path(struct expr * dr){
+	assert(dr->type == PATH);
+
+
+	FILE *f;
+	f = fopen("PATH.html","w");
+	if(f == NULL){	
+		f = fopen("PATH.html","wb");
+	}else if(f == NULL){	
+		printf("error opening file");
+		exit(1);
+	}
+
+	
+	fprintf(f,"<!DOCTYPE HTML>\n");
+	fprintf(f,"<html>\n");
+	fprintf(f,"<head>\n");
+	fprintf(f,"<script type=\"text/javascript\">\n");
+	fprintf(f,"function drawShape(){\n");
+	fprintf(f,"		var canvas = document.getElementById('mycanvas');\n");
+	fprintf(f,"		if (canvas.getContext){\n");
+	fprintf(f,"			var ctx = canvas.getContext('2d');\n");
+	fprintf(f,"			ctx.beginPath();\n");
+	fprintf(f,"			ctx.moveTo(%d,%d);\n",dr->expr->path.point->expr->point.x->expr->num, dr->expr->path.point->expr->point.y->expr->num);
+	struct expr *next = dr->expr->path.next;
+	while(next){
+			fprintf(f,"			ctx.lineTo(%d,%d);\n",next->expr->path.point->expr->point.x->expr->num, next->expr->path.point->expr->point.y->expr->num);
+			next = next->expr->path.next;
+		
+	}	
+	fprintf(f,"			ctx.stroke();\n");
+	fprintf(f,"		} else {\n");
+	fprintf(f,"			alert('You need Safari or Firefox 1.5+ to see this demo.');\n");  
+	fprintf(f,"		}\n");
+	fprintf(f,"	}\n");
+	fprintf(f,"</script>\n");
+	fprintf(f,"</head>\n");
+	fprintf(f,"<body onload=\"drawShape();\">\n");
+	fprintf(f,"		<canvas id=\"mycanvas\"></canvas>\n");
+	fprintf(f,"</body>\n");
+	fprintf(f,"</html>\n");
+	fclose(f);
+	printf("file PATH.html created !");
+
+
+
+
+	
+
+}
+
+void draw_circle(struct expr * dr){
+	assert(dr->type == CIRCLE);
+	FILE *f;
+	f = fopen("CIRCLE.html","w");
+	if(f == NULL){	
+		f = fopen("CIRCLE.html","wb");
+	}else if(f == NULL){	
+		printf("error opening file");
+		exit(1);
+	}
+
+
+	
+	fprintf(f,"<!DOCTYPE HTML>\n");
+	fprintf(f,"<html>\n");
+	fprintf(f,"<head>\n");
+	fprintf(f,"<script type=\"text/javascript\">\n");
+	fprintf(f,"function drawShape(){\n");
+	fprintf(f,"		var canvas = document.getElementById('mycanvas');\n");
+	fprintf(f,"		if (canvas.getContext){\n");
+	fprintf(f,"			var ctx = canvas.getContext('2d');\n");
+	fprintf(f,"			ctx.beginPath();\n");
+	fprintf(f,"			ctx.arc(%d,%d,%d,0,2*Math.PI);\n",dr->expr->circle.center->expr->point.x->expr->num,dr->expr->circle.center->expr->point.y->expr->num,dr->expr->circle.radius->expr->num);
+	fprintf(f,"			ctx.stroke();\n");
+	fprintf(f,"		} else {\n");
+	fprintf(f,"			alert('You need Safari or Firefox 1.5+ to see this demo.');\n");  
+	fprintf(f,"		}\n");
+	fprintf(f,"	}\n");
+	fprintf(f,"</script>\n");
+	fprintf(f,"</head>\n");
+	fprintf(f,"<body onload=\"drawShape();\">\n");
+	fprintf(f,"		<canvas id=\"mycanvas\"></canvas>\n");
+	fprintf(f,"</body>\n");
+	fprintf(f,"</html>\n");
+	fclose(f);
+	printf("file CIRCLE.html created !");
+
+
+
+	
+
+}
+
+
+
+
+
 
 void step(struct configuration *conf){
   struct expr *expr = conf->closure->expr;
@@ -140,8 +238,10 @@ void step(struct configuration *conf){
   case POINT:
 	return;
   case PATH:
+	draw_path(expr);
 	return;
   case CIRCLE:
+	draw_circle(expr);
 	return;
   case OP:
     {

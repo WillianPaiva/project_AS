@@ -14,6 +14,15 @@
   struct configuration concrete_conf;
   struct configuration *conf = &concrete_conf;
   struct closure *temp;
+  void print_exp(struct configuration *conf){ 
+	if(conf->closure->expr->type==NUM){
+     printf(">>> %d\n",conf->closure->expr->expr->num);
+   }
+    if(conf->closure->expr->type==POINT){
+     printf(">>> POINT X=%d Y=%d \n", conf->closure->expr->expr->point.x->expr->num, conf->closure->expr->expr->point.y->expr->num);
+   }
+   }
+
 %}
 
 
@@ -28,7 +37,7 @@
 /*Tokens utilisés*/
 %token<num>T_NUM
 %token<id>T_ID T_PRINT
-%token FIN_EXPR T_PLUS T_MINUS T_MULT T_DIV T_LEQ T_LE T_GEQ T_GE T_EQ T_OR T_AND T_NOT T_EQUAL T_IF T_ELSE T_THEN T_FUN T_ARROW T_LET T_IN T_WHERE T_NEXT T_POP T_PUSH T_PATH T_CIRCLE
+%token FIN_EXPR T_PLUS T_MINUS T_MULT T_DIV T_LEQ T_LE T_GEQ T_GE T_EQ T_OR T_AND T_NOT T_EQUAL T_IF T_ELSE T_THEN T_FUN T_ARROW T_LET T_IN T_WHERE T_NEXT T_POP T_PUSH T_PATH T_CIRCLE T_DRAW
 
 
  /*Priorités nécessaires*/
@@ -49,13 +58,12 @@
  /*GRAMMAIRE UTILISEE*/
 
  /*Terminal*/
-s       :s e[expr] FIN_EXPR {conf->closure = mk_closure($expr,env); conf->stack=NULL; step(conf);
-    if(conf->closure->expr->type==NUM){
-     printf(">>> %d\n",conf->closure->expr->expr->num);
-   }
+s       :s e[expr] FIN_EXPR {conf->closure = mk_closure($expr,env); conf->stack=NULL; step(conf); print_exp(conf);
+    
  }
-|s en FIN_EXPR {env = $2;}
-|s T_PRINT FIN_EXPR     {$2[strlen($2)-1] = 0;printf("%s\n",$2);}
+|s en FIN_EXPR				   {env = $2;}
+|s T_PRINT FIN_EXPR			   {$2[strlen($2)-1] = 0;printf("%s\n",$2);}
+|s T_DRAW '(' e[d] ')' FIN_EXPR   {draw_path($d);}		
 |
 ;
 
