@@ -108,13 +108,13 @@ e   : e T_MINUS e                                          { $$ = mk_app(mk_app(
 	| T_IF e[cond] T_THEN e[then_br] T_ELSE e[else_br]     { $$ = mk_cond($cond, $then_br, $else_br) ;}
 	| '[' list[l] ']'                                      { $$ = $l;}/*OP sur Listes*/
 	| e[exp] T_PUSH e[l]                                   { $$ = mk_app(mk_app(mk_op(PUSH),$exp),$l);}
-	|  e[fun] e[arg] %prec FUNCTION_APPLICATION                             { $$ = mk_app($fun,$arg);}/*Exécution de fonctions à plusieurs variables*/
+	|  e[fun] e[arg] %prec FUNCTION_APPLICATION            { $$ = mk_app($fun,$arg);}/*Exécution de fonctions à plusieurs variables*/
 	| '(' e ')'                                            { $$ = $2;}/*Ignorer les parentheses inutiles*/
     ;
 /*Boucle pour plusieurs paramtres d'une fonction*/
 
 numb : T_NUM												   { $$ = $1;}
-	 | T_MINUS T_NUM  %prec MINUSSS						       { $$ = -$2;}
+	 | T_MINUS T_NUM              						       { $$ = -$2;}
 	 ;
 
 
