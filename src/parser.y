@@ -42,19 +42,18 @@
 
  /*Priorités nécessaires*/
 %nonassoc T_EQUAL T_ARROW T_LET T_FUN T_IF T_THEN T_WHERE T_IN T_ELSE
-%left  T_LEQ T_LE T_GE T_GEQ T_EQ
+%left  T_LEQ T_LE T_GE T_GEQ T_EQ T_PUSH
 %left T_OR 
 %left T_AND T_PATH T_BEZIER T_CIRCLE 
 %nonassoc T_NOT T_POP T_NEXT 
 %left T_PLUS T_MINUS
-%left T_MULT T_DIV T_PUSH
+%left T_MULT T_DIV 
 %left FUNCTION_APPLICATION  T_NUM T_ID '{' '(' '['  
 
 
 /* Déclaration des types*/
 %type<expr> e arg_list  list 
 %type<env> en
-%type<num> numb
 
 
 
@@ -83,7 +82,8 @@ en  :T_LET T_ID[x] T_EQUAL e[expr]                                  {$$ = push_r
 
 /*Reconnaissance d'entiers*/
 e   : e T_MINUS e                                          { $$ = mk_app(mk_app(mk_op(MINUS),$1),$3);}
-	| numb												   { $$ = mk_int($1);}
+	| T_NUM												   { $$ = mk_int($1);}
+	| T_MINUS e											   { $$ = mk_app(mk_app(mk_op(MULT),mk_int(-1)),$2);}
 	| T_POP e[l]										   { $$ = mk_app(mk_op(POP),$l);}
 	| T_NEXT e[l]										   { $$ = mk_app(mk_op(NEXT),$l);}
 	|'{' e[x] ',' e[y] '}'								   { $$ = mk_point($x,$y);}	
@@ -113,9 +113,7 @@ e   : e T_MINUS e                                          { $$ = mk_app(mk_app(
     ;
 /*Boucle pour plusieurs paramtres d'une fonction*/
 
-numb : T_NUM												   { $$ = $1;}
-	 | T_MINUS T_NUM              						       { $$ = -$2;}
-	 ;
+
 
 
 /*f_arg :e                                                            {$$ = $1;}*/
