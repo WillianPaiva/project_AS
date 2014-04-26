@@ -44,11 +44,11 @@
 %nonassoc T_EQUAL T_ARROW T_LET T_FUN T_IF T_THEN T_WHERE T_IN T_ELSE
 %left  T_LEQ T_LE T_GE T_GEQ T_EQ
 %left T_OR 
-%left T_AND T_PATH
+%left T_AND T_PATH T_BEZIER T_CIRCLE 
 %nonassoc T_NOT T_POP T_NEXT 
 %left T_PLUS T_MINUS
 %left T_MULT T_DIV T_PUSH
-%left  FUNCTION_APPLICATION MINUSSS T_NUM T_ID '{' '('
+%left FUNCTION_APPLICATION  T_NUM T_ID '{' '(' '['  
 
 
 /* Déclaration des types*/
