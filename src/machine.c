@@ -307,7 +307,24 @@ void drawing(struct expr * dr, struct env *env){
 
 }
 
-
+//Retourne le point (tx,ty) resultant de la translation de p par v
+struct expr* translation(struct expr* p, struct expr* v){
+  assert(p->type==POINT && v->type==POINT);
+  int px,py,vx,vy;
+  px = p->expr->point.x->expr->num;
+  py = p->expr->point.y->expr->num;
+  vx = v->expr->point.x->expr->num;
+  vy = v->expr->point.y->expr->num;
+  px += vx;
+  py += vy;
+  struct expr* tx;
+  tx->type = NUM;
+  tx->expr->num = px;
+  struct expr* ty;
+  ty->type = NUM;
+  ty->expr->num = py;
+  return mk_point(tx,ty);
+}
 
 void step(struct configuration *conf){
   struct expr *expr = conf->closure->expr;
@@ -377,7 +394,6 @@ void step(struct configuration *conf){
      if(stack==NULL){return;}
      struct closure *arg1 = stack->closure;
      stack = pop_stack(stack);
-     struct expr *e1 = conf->closure->expr;
      switch(expr->expr->op){
 	 case DRAW:
 		 eval_arg(conf,arg1);
@@ -401,7 +417,6 @@ void step(struct configuration *conf){
      if(stack==NULL){return;}
      struct closure *arg2 = stack->closure;
      stack = pop_stack(stack);
-     struct expr *e2 = conf->closure->expr;
      int k1,k2;
      switch (expr->expr->op){
      case PLUS: 
@@ -474,9 +489,22 @@ void step(struct configuration *conf){
      case PUSH: 
        conf->closure = mk_closure(mk_cell(arg1->expr,arg2->expr),arg1->env);
        return;
+     case TRANS:
+       {
+	 struct expr* fig = arg1->expr;
+	 struct expr* vect = arg2->expr;
+	 switch (fig->type){
+	 case PATH:
+	   conf->closure = mk_closure(mk_path(translation(fig->expr->path.point,vect),translation(fig->expr->path.next,vect)),arg1->env);
+	 case CIRCLE:
+	   conf->closure = mk_closure(mk_circle(translation(fig->expr->circle.center,vect),fig->expr->circle.radius),arg1->env);
+	 case BEZIER:
+	   conf->closure = mk_closure(mk_bezier(translation(fig->expr->bezier.pt1,vect),translation(fig->expr->bezier.next,vect)),arg1->env);
+	 }
+       }
      default: assert(0);
      }   
-   }
+    }
    ;
   default: assert(0);
   }

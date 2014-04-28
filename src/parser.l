@@ -43,6 +43,9 @@
 "hd" return T_POP;
 "tl" return T_NEXT;
 "::" return T_PUSH;
+"translation" return T_TRANS;
+"rotation" return T_ROT;
+"homotetie" return T_HOM;
 
 [(),\[\]{}]         {return yytext[0];}
 [[:space:]] ;

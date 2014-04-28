@@ -37,18 +37,18 @@
 /*Tokens utilisés*/
 %token<num>T_NUM 
 %token<id>T_ID T_PRINT
-%token FIN_EXPR T_PLUS T_MINUS T_MULT T_DIV T_LEQ T_LE T_GEQ T_GE T_EQ T_OR T_AND T_NOT T_EQUAL T_IF T_ELSE T_THEN T_FUN T_ARROW T_LET T_IN T_WHERE T_NEXT T_POP T_PUSH T_PATH T_CIRCLE T_DRAW T_BEZIER
+%token FIN_EXPR T_PLUS T_MINUS T_MULT T_DIV T_LEQ T_LE T_GEQ T_GE T_EQ T_OR T_AND T_NOT T_EQUAL T_IF T_ELSE T_THEN T_FUN T_ARROW T_LET T_IN T_WHERE T_NEXT T_POP T_PUSH T_PATH T_CIRCLE T_DRAW T_BEZIER T_TRANS T_ROT T_HOM
 
 
  /*Priorités nécessaires*/
-%nonassoc T_EQUAL T_ARROW T_LET T_FUN T_IF T_THEN T_WHERE T_IN T_ELSE
-%left  T_LEQ T_LE T_GE T_GEQ T_EQ T_PUSH
+%nonassoc T_EQUAL T_ARROW T_LET T_FUN T_IF T_THEN T_WHERE T_IN T_ELSE 
+%left  T_LEQ T_LE T_GE T_GEQ T_EQ T_PUSH T_TRANS
 %left T_OR 
 %left T_AND T_PATH T_BEZIER T_CIRCLE 
 %nonassoc T_NOT T_POP T_NEXT 
 %left T_PLUS T_MINUS
 %left T_MULT T_DIV 
-%left FUNCTION_APPLICATION  T_NUM T_ID '{' '(' '['  
+%left FUNCTION_APPLICATION  T_NUM T_ID '{' '(' '[' 
 
 
 /* Déclaration des types*/
@@ -89,6 +89,9 @@ e   : e T_MINUS e                                          { $$ = mk_app(mk_app(
 	|'{' e[x] ',' e[y] '}'								   { $$ = mk_point($x,$y);}	
 	| T_BEZIER '(' e[p1] ',' e[p2] ',' e[p3] ',' e[p4] ')' { $$ = mk_bezier($p1,mk_bezier($p2,mk_bezier($p3,mk_bezier($p4,NULL))));}
 	| T_CIRCLE '(' e[c] ',' e[r] ')'                       { $$ = mk_circle($c,$r);}
+        | T_TRANS '(' e[fig] ',' e[vect] ')' { $$ = mk_app(mk_app(mk_op(TRANS),$fig),$vect);}
+//| T_ROT '(' e[fig] ',' e[centre] ',' e[angl] ')' { }
+//| T_HOM '(' e[fig] ',' e[centre] ',' e[ration] ')' { }
 	| e T_PATH e                                           { $$ = mk_path($1,mk_path($3,NULL));}
 	| e T_PLUS e                                           { $$ = mk_app(mk_app(mk_op(PLUS),$1),$3);}
 	| e T_DIV e                                            { $$ = mk_app(mk_app(mk_op(DIV),$1),$3);}
