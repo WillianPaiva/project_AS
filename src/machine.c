@@ -498,8 +498,14 @@ void step(struct configuration *conf){
 	   conf->closure = mk_closure(translation(fig,vect),arg1->env);
 	   return;
 	 case PATH:
-	   conf->closure = mk_closure(mk_path(translation(fig->expr->path.point,vect),translation(fig->expr->path.next,vect)),arg1->env);
-	   return;
+	   {
+	     struct expr* first;
+	     struct expr* second;
+	     first = translation(fig->expr->path.point,vect);
+	     second = translation(fig->expr->path.next->expr->path.point,vect);
+	     conf->closure = mk_closure(mk_path(first,second),arg1->env);
+	     return;
+	   }
 	 case CIRCLE:
 	   conf->closure = mk_closure(mk_circle(translation(fig->expr->circle.center,vect),fig->expr->circle.radius),arg1->env);
 	   return;
