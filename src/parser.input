@@ -1,42 +1,113 @@
-print"#######################################################################################";
-
-print"testing divisin with recursion";
-
-let div_rec = fun p n acc -> if p<n then acc else (div_rec (p-n) n (acc+1));
+print"/******************************/";
+print"/* tests de la syntaxe de base */";
+print"/******************************/";
+print"";
+print"-3+10<=7;";
+-3+10 <= 7;
+print"";
+print"let a = 4;";
+let a = 4;
+print"a;";
+a;
+print"";
+print"let acc = fun x -> x+1;";
+let acc = fun x -> x+1;
+print"let square = fun x -> x*x;";
+let square = fun x -> x*x;
+print"";
+print"acc a;";
+acc a;
+print"";
+print"square a;";
+square a;
+print"";
+print"let b = 5;";
+let b = 5;
+print"";
+print"acc a + b * 3;";
+acc a + b * 3;
+print"";
+print"acc a + acc b * 2;";
+acc a + acc b * 2;
+print"";
+print"let sq = fun x y -> square (x+y);";
+let sq = fun x y -> square (x+y);
+print"sq a b";
+sq a b;
+print"";
+print"if acc b > 2 then square + 2 a else square b - 1;";
+if acc b > 2 then square a + 2 else square b - 1;
+print"";
+print"if if a==1 then 0 else 1 then a else -a;";
+if if a==1 then 0 else 1 then a else -a;
+print"";
+print"(if acc a > 2 then square a + 2 else square a - 1) + 5 * (if acc b > 0 || acc a >0 then -1 else 1);";
+(if acc a > 2 then square a + 2 else square a - 1) + 5 * (if acc b > 0 || acc a >0 then -1 else 1);
+print"";
+print"if acc a > 2 && square b *5 > 200/7 then square a + 2 else square a -1;";
+if acc a > 2 && square b *5 > 200/7 then square a + 2 else square a -1;
+print"";
+print"(fun z -> (if acc a > 2 || if square b > 24 then acc a -1 <0 else square a > acc a ";
+       	print"  then fun a b -> a*a + 5*b -z ";
+    	print"  else fun a b -> a*b-b +z) 3 4) 7;";
+(fun z -> (if acc a > 2 || if square b > 24 then acc a -1 <0 else square a > acc a 
+       	  then fun a b -> a*a + 5*b -z
+    	  else fun a b -> a*b-b +z) 3 4) 7;
+print"";
+print"/***  test fonction récursive ***/";
+print"let div_rec = fun p n acu -> if p<n then acu else (div_rec (p-n) n (acu+1));";
+print"let div = fun p n -> (div_rec p n 0);";
+print"(div 12 3);";
+let div_rec = fun p n acu -> if p<n then acu else (div_rec (p-n) n (acu+1));
 let div = fun p n -> (div_rec p n 0);
 (div 12 3);
-print"#######################################################################################";
-
-print"test factorial";
-
+print"";
+print"/*** test factorielle ***/";
+print"let fac = fun n -> if n<=0 then 1 else  n * (fac (n-1)) ;";
+print"(fac  2);";
 let fac = fun n -> if n<=0 then 1 else  n * (fac (n-1)) ;
-(fac  2);
-
-print"#######################################################################################";
-
-print"test function with many argumants and the aplication with many arguments";
-
+fac 2;
+print"";
+print"/*** fonction avec plusieurs arguments ***/";
+print"let f = fun x y -> x+y;";
+print"f 5 6;";
 let f = fun x y -> x+y;
+f 5 6;
+print"";
+print"/****************************/";
+print"/* tests sur LET IN et WHERE */";
+print"/****************************/";
+print"";
+print"square x + x where x=3;";
+square x + x where x=3;
+print"";
+print"let x = 5 in x < 10 + square 2;";
+let x = 5 in x < 10 + square 2;
+x;
+print"";
+print"/************************/";
+print"/* tests sur les listes */";
+print"/************************/";
+print""; 
+print"let li = [0,1,2,3];";
+let li = [0,1,2,3];
+li;
 
+let p1 = {1,2};
+let p2 = {4,5};
+let p3 = {6,7};
+Draw(p1--p2--p3);
+let p4 = {20,20};
+let p5 = {20,100};
+let p6 = {200,100};
+let p7 = {200,20};
+let be = Bezier(p4,p5,p6,p7);
+Draw(be);
 
-(f 5 6);
-print"#######################################################################################";
+let p8 = {100,50};
+let p9 = {200,100};
+let c = Cercle(p8,50);
+Draw(c);
 
-
-let l = {1,2};
-let f = {100,100};
-let g = {50,100};
-Draw(l--f);
-let fig = translation(l--f,g);
-Draw(figfig);
-let p = {100,75};
-let y = Cercle(p,50);
-Draw(y);
-let p = {20,20};
-let t = {20,100};
-let u = {200,100};
-let g = {200,20};
-let b = Bezier(p,t,u,g);
-Draw(b);
 
 
