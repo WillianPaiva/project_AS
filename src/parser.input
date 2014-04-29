@@ -81,33 +81,48 @@ print"";
 print"square x + x where x=3;";
 square x + x where x=3;
 print"";
-print"let x = 5 in x < 10 + square 2;";
-let x = 5 in x < 10 + square 2;
-x;
+print"let x = 5 in x < 10;";
+let x = 5 in x < 10;
+
 print"";
 print"/************************/";
 print"/* tests sur les listes */";
 print"/************************/";
 print""; 
-print"let li = [0,1,2,3];";
-let li = [0,1,2,3];
-li;
+print"let l = [0,1,2];";
+let l = [0,1,2];
+print"";
+print"hd l;";
+hd l;
+print"";
+print"hd tl l;";
+hd tl l;
+print"";
+print"hd tl tl l;";
+hd tl tl l;
+print"";
 
-let p1 = {1,2};
-let p2 = {4,5};
-let p3 = {6,7};
-Draw(p1--p2--p3);
-let p4 = {20,20};
-let p5 = {20,100};
-let p6 = {200,100};
-let p7 = {200,20};
-let be = Bezier(p4,p5,p6,p7);
-Draw(be);
+print"";
+print"/************************/";
+print"/* tests sur les objets */";
+print"/************************/";
+print"";
 
-let p8 = {100,50};
-let p9 = {200,100};
-let c = Cercle(p8,50);
-Draw(c);
+let a = {1,2};
+let b = {4,5};
+let c = {6,7};
+Draw(a--b--c);
+let d = {20,20};
+let e = {20,100};
+let f = {200,100};
+let g = {200,20};
+let h = Bezier(d,e,f,g);
+Draw(h);
+
+let i = {100,50};
+let j = {200,100};
+let k = Cercle(i,50);
+Draw(k);
 
 
 
