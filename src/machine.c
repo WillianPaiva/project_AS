@@ -317,10 +317,10 @@ struct expr* translation(struct expr* p, struct expr* v){
   vy = v->expr->point.y->expr->num;
   px += vx;
   py += vy;
-  struct expr* tx;
+  struct expr* tx = mk_node();
   tx->type = NUM;
   tx->expr->num = px;
-  struct expr* ty;
+  struct expr* ty = mk_node();
   ty->type = NUM;
   ty->expr->num = py;
   return mk_point(tx,ty);
@@ -494,13 +494,20 @@ void step(struct configuration *conf){
 	 struct expr* fig = arg1->expr;
 	 struct expr* vect = arg2->expr;
 	 switch (fig->type){
+	 case POINT:
+	   conf->closure = mk_closure(translation(fig,vect),arg1->env);
+	   return;
 	 case PATH:
 	   conf->closure = mk_closure(mk_path(translation(fig->expr->path.point,vect),translation(fig->expr->path.next,vect)),arg1->env);
+	   return;
 	 case CIRCLE:
 	   conf->closure = mk_closure(mk_circle(translation(fig->expr->circle.center,vect),fig->expr->circle.radius),arg1->env);
+	   return;
 	 case BEZIER:
 	   conf->closure = mk_closure(mk_bezier(translation(fig->expr->bezier.pt1,vect),translation(fig->expr->bezier.next,vect)),arg1->env);
+	   return;
 	 }
+	 return;
        }
      default: assert(0);
      }   
