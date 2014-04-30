@@ -90,8 +90,8 @@ e   : e T_MINUS e                                          { $$ = mk_app(mk_app(
 	| T_BEZIER '(' e[p1] ',' e[p2] ',' e[p3] ',' e[p4] ')' { $$ = mk_bezier($p1,mk_bezier($p2,mk_bezier($p3,mk_bezier($p4,NULL))));}
 	| T_CIRCLE '(' e[c] ',' e[r] ')'                       { $$ = mk_circle($c,$r);}
         | T_TRANS '(' e[fig] ',' e[vect] ')' { $$ = mk_app(mk_app(mk_op(TRANS),$fig),$vect);}
-//| T_ROT '(' e[fig] ',' e[centre] ',' e[angl] ')' { }
-//| T_HOM '(' e[fig] ',' e[centre] ',' e[ration] ')' { }
+/*| T_ROT '(' e[fig] ',' e[centre] ',' e[angl] ')' { }*/
+/*| T_HOM '(' e[fig] ',' e[centre] ',' e[ration] ')' { }*/
 	| e T_PATH e                                           { $$ = mk_path($1,mk_path($3,NULL));}
 	| e T_PLUS e                                           { $$ = mk_app(mk_app(mk_op(PLUS),$1),$3);}
 	| e T_DIV e                                            { $$ = mk_app(mk_app(mk_op(DIV),$1),$3);}
