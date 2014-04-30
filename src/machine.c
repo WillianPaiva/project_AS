@@ -15,7 +15,6 @@ int get_num(struct closure *cl){
 } 
 
 
-
 void eval_arg(struct configuration *conf, struct closure *arg){
   conf->closure = arg;
   conf->stack = NULL;
@@ -307,9 +306,8 @@ void drawing(struct expr * dr, struct env *env){
 
 }
 
-//Retourne le point (tx,ty) resultant de la translation de p par v
-struct expr* translation(struct expr* p, struct expr* v){
-  assert(p->type==POINT && v->type==POINT);
+struct expr* trans_point(struct expr* p, struct expr* v){
+  assert(p->type == POINT && v->type == POINT);
   int px,py,vx,vy;
   px = p->expr->point.x->expr->num;
   py = p->expr->point.y->expr->num;
@@ -324,6 +322,20 @@ struct expr* translation(struct expr* p, struct expr* v){
   ty->type = NUM;
   ty->expr->num = py;
   return mk_point(tx,ty);
+}
+
+//Retourne le point (tx,ty) resultant de la translation de p par v
+struct expr* translater(struct expr* fig, struct expr* vect){
+  switch (fig->type){
+  case POINT:
+    return trans_point(fig,vect);
+  case PATH:
+    return mk_path(trans_point(fig->expr->path.point,vect),trans_point(fig->expr->path.next,vect));
+  case CIRCLE:
+    return mk_circle(trans_point(fig->expr->circle.center,vect),fig->expr->circle.radius);
+  case BEZIER:
+    return mk_bezier(trans_point(fig->expr->bezier.pt1,vect),trans_point(fig->expr->bezier.next,vect));
+  }
 }
 
 void step(struct configuration *conf){
@@ -380,13 +392,13 @@ void step(struct configuration *conf){
   case CELL:
     return;
   case POINT:
-	return;
+    return;
   case PATH:
-	return;
+    return;
   case CIRCLE:
-	return;
+    return;
   case BEZIER:
-	return;
+    return;
 
   case OP:
     {
@@ -490,35 +502,12 @@ void step(struct configuration *conf){
        conf->closure = mk_closure(mk_cell(arg1->expr,arg2->expr),arg1->env);
        return;
      case TRANS:
-       {
-	 struct expr* fig = arg1->expr;
-	 struct expr* vect = arg2->expr;
-	 switch (fig->type){
-	 case POINT:
-	   conf->closure = mk_closure(translation(fig,vect),arg1->env);
-	   return;
-	 case PATH:
-	   {
-	     struct expr* first;
-	     struct expr* second;
-	     first = translation(fig->expr->path.point,vect);
-	     second = translation(fig->expr->path.next->expr->path.point,vect);
-	     conf->closure = mk_closure(mk_path(first,second),arg1->env);
-	     return;
-	   }
-	 case CIRCLE:
-	   conf->closure = mk_closure(mk_circle(translation(fig->expr->circle.center,vect),fig->expr->circle.radius),arg1->env);
-	   return;
-	 case BEZIER:
-	   conf->closure = mk_closure(mk_bezier(translation(fig->expr->bezier.pt1,vect),translation(fig->expr->bezier.next,vect)),arg1->env);
-	   return;
-	 }
+       conf->closure = mk_closure(translater(arg1->expr,arg2->expr),arg1->env);
 	 return;
-       }
      default: assert(0);
      }   
     }
-   ;
+    ;
   default: assert(0);
-  }
+}
 }
