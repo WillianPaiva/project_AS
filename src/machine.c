@@ -306,35 +306,61 @@ void drawing(struct expr * dr, struct env *env){
 
 }
 
-struct expr* trans_point(struct expr* p, struct expr* v){
+void trans_point(struct expr* p, struct expr* v){
   assert(p->type == POINT && v->type == POINT);
-  int px,py,vx,vy;
-  px = p->expr->point.x->expr->num;
-  py = p->expr->point.y->expr->num;
-  vx = v->expr->point.x->expr->num;
-  vy = v->expr->point.y->expr->num;
-  px += vx;
-  py += vy;
-  struct expr* tx = mk_node();
-  tx->type = NUM;
-  tx->expr->num = px;
-  struct expr* ty = mk_node();
-  ty->type = NUM;
-  ty->expr->num = py;
-  return mk_point(tx,ty);
+  p->expr->point.x->expr->num +=  v->expr->point.x->expr->num;
+  p->expr->point.y->expr->num +=  v->expr->point.y->expr->num;
+
 }
 
 //Retourne le point (tx,ty) resultant de la translation de p par v
-struct expr* translater(struct expr* fig, struct expr* vect){
+void translater(struct expr* fig, struct expr* vect, struct env *env){
+  	struct expr * p1 ;
+	struct expr *next;
+
+
   switch (fig->type){
+
   case POINT:
-    return trans_point(fig,vect);
+    trans_point(fig,vect);
+	return;
   case PATH:
-    return mk_path(trans_point(fig->expr->path.point,vect),trans_point(fig->expr->path.next,vect));
+	trans_point(fig->expr->path.point,vect);
+	next = fig->expr->path.next;
+
+	while(next){
+		p1 = next->expr->path.point;
+		while(p1->type == ID){
+			p1 = id(p1,env);
+		}
+		trans_point(p1,vect);
+	
+	}
+
+	return;	
+
   case CIRCLE:
-    return mk_circle(trans_point(fig->expr->circle.center,vect),fig->expr->circle.radius);
+		trans_point(fig->expr->circle.center,vect);
+		return;
+
+
   case BEZIER:
-    return mk_bezier(trans_point(fig->expr->bezier.pt1,vect),trans_point(fig->expr->bezier.next,vect));
+	trans_point(fig->expr->bezier.pt1,vect);
+	next = fig->expr->bezier.next;
+
+	while(next){
+		p1 = next->expr->bezier.pt1;
+		while(p1->type == ID){
+			p1 = id(p1,env);
+		}
+		trans_point(p1,vect);
+	
+	}
+
+	return;	
+  
+  
+  
   }
 }
 
@@ -429,6 +455,9 @@ void step(struct configuration *conf){
      if(stack==NULL){return;}
      struct closure *arg2 = stack->closure;
      stack = pop_stack(stack);
+	 struct expr *t1;
+	 struct expr *t2;
+
      int k1,k2;
      switch (expr->expr->op){
      case PLUS: 
@@ -502,7 +531,11 @@ void step(struct configuration *conf){
        conf->closure = mk_closure(mk_cell(arg1->expr,arg2->expr),arg1->env);
        return;
      case TRANS:
-       conf->closure = mk_closure(translater(arg1->expr,arg2->expr),arg1->env);
+	   eval_arg(conf,arg1);
+       t1 = conf->closure->expr;
+       eval_arg(conf,arg2);
+       t2 = conf->closure->expr;
+       translater(t1,t2,conf->closure->env);
 	 return;
      default: assert(0);
      }   
