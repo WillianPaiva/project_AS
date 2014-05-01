@@ -90,6 +90,8 @@ struct stack *push_stack(struct closure *cl, struct stack *stack){
   st->next = stack;
   return st;
 }
+
+
 void draw_path(struct expr * dr, struct env * env){
 	char * name = "PATH.html";
 	FILE *f;
@@ -313,39 +315,73 @@ void trans_point(struct expr* p, struct expr* v){
 
 }
 
-//Retourne le point (tx,ty) resultant de la translation de p par v
-void translater(struct expr* fig, struct expr* vect, struct env *env){
+struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
   	struct expr * p1 ;
 	struct expr *next;
+	char test[12][12] = {"ID", "FUN", "APP", "NUM", "OP", "COND", "CELL", "NIL", "POINT", "PATH", "CIRCLE","BEZIER"};
+	printf("------->%s\n",test[fig->type]);
 
 
   switch (fig->type){
 
   case POINT:
     trans_point(fig,vect);
-	return;
+	return fig;
   case PATH:
-	trans_point(fig->expr->path.point,vect);
+	   p1 = fig->expr->path.point;
+	   printf("------->%s\n",test[p1->type]);
+
+		while(p1->type == ID){
+			p1 = id(p1,env);
+			printf("------->%s\n",test[p1->type]);
+
+		}
+
+	
+	trans_point(p1,vect);
 	next = fig->expr->path.next;
 
 	while(next){
 		p1 = next->expr->path.point;
+		 printf("------->%s\n",test[p1->type]);
+
 		while(p1->type == ID){
 			p1 = id(p1,env);
+			printf("------->%s\n",test[p1->type]);
+
 		}
+		assert(p1->type = POINT);
 		trans_point(p1,vect);
+		next = next->expr->path.next;
+
 	
 	}
 
-	return;	
+	return fig;	
 
   case CIRCLE:
-		trans_point(fig->expr->circle.center,vect);
-		return;
+		p1 = fig->expr->circle.center;
+	   printf("------->%s\n",test[p1->type]);
+
+		while(p1->type == ID){
+			p1 = id(p1,env);
+			printf("------->%s\n",test[p1->type]);
+
+		}
+
+		
+		trans_point(p1,vect);
+		return fig;
 
 
   case BEZIER:
-	trans_point(fig->expr->bezier.pt1,vect);
+		p1 = fig->expr->bezier.pt1;
+		while(p1->type == ID){
+			p1 = id(p1,env);
+		}
+
+	
+	trans_point(p1,vect);
 	next = fig->expr->bezier.next;
 
 	while(next){
@@ -354,10 +390,12 @@ void translater(struct expr* fig, struct expr* vect, struct env *env){
 			p1 = id(p1,env);
 		}
 		trans_point(p1,vect);
+		next = next->expr->bezier.next;
+
 	
 	}
 
-	return;	
+	return fig;	
   
   
   
@@ -535,7 +573,7 @@ void step(struct configuration *conf){
        t1 = conf->closure->expr;
        eval_arg(conf,arg2);
        t2 = conf->closure->expr;
-       translater(t1,t2,conf->closure->env);
+       conf->closure = mk_closure(translater(t1,t2,conf->closure->env),arg1->env);
 	 return;
      default: assert(0);
      }   
