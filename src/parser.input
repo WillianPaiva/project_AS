@@ -108,21 +108,35 @@ print"/* tests sur les objets */";
 print"/************************/";
 print"";
 
-let a = {1,2};
-let b = {4,5};
-let c = {6,7};
-Draw(a--b--c);
-let d = {20,20};
-let e = {20,100};
-let f = {200,100};
-let g = {200,20};
-let h = Bezier(d,e,f,g);
-Draw(h);
+let pa = {10,20};
+let pb = {40,50};
+let pc = {60,70};
+let pd = pa--pb--pc;
 
-let i = {100,50};
-let j = {200,100};
-let k = Cercle(i,50);
-Draw(k);
+translation(pd,{10,20});
+
+
+
+let ba = {20,20};
+let bb = {20,100};
+let bc = {200,100};
+let bd = {200,20};
+let bg = Bezier(ba,bb,bc,bd);
+
+translation(bg,{10,20});
+
+
+
+
+let ca = {100,50};
+let cc = Cercle(ca,50);
+
+translation(cc,{10,20});
+Draw([cc,bg,pd]);
+
+
+
+
 
 
 

@@ -90,26 +90,8 @@ struct stack *push_stack(struct closure *cl, struct stack *stack){
   st->next = stack;
   return st;
 }
+void html_head(FILE *f){
 
-
-void draw_path(struct expr * dr, struct env * env){
-	char * name = "PATH.html";
-	FILE *f;
-	f = fopen(name,"w");
-	if(f == NULL){	
-		f = fopen(name,"wb");
-	}
-	struct expr *p1 = dr->expr->path.point;
-	while(p1->type == ID){
-		p1 = id(p1,env);	
-	}
-
-	assert(p1->type == POINT);
-
-	int x = p1->expr->point.x->expr->num;
-    int y = p1->expr->point.y->expr->num;
-
-	
 	fprintf(f,"<!DOCTYPE HTML>\n");
 	fprintf(f,"<html>\n");
 	fprintf(f,"<head>\n");
@@ -119,6 +101,39 @@ void draw_path(struct expr * dr, struct env * env){
 	fprintf(f,"		if (canvas.getContext){\n");
 	fprintf(f,"			var ctx = canvas.getContext('2d');\n");
 	fprintf(f,"			ctx.beginPath();\n");
+
+}
+
+
+void html_tail(FILE *f){
+
+	
+	fprintf(f,"			ctx.stroke();\n");
+	fprintf(f,"		} else {\n");
+	fprintf(f,"			alert('You need Safari or Firefox 1.5+ to see this demo.');\n");  
+	fprintf(f,"		}\n");
+	fprintf(f,"	}\n");
+	fprintf(f,"</script>\n");
+	fprintf(f,"</head>\n");
+	fprintf(f,"<body onload=\"drawShape();\">\n");
+	fprintf(f,"		<canvas id=\"mycanvas\"></canvas>\n");
+	fprintf(f,"</body>\n");
+	fprintf(f,"</html>\n");
+
+
+}
+
+void draw_path(struct expr * dr, struct env * env,FILE *f){
+	struct expr *p1 = dr->expr->path.point;
+	while(p1->type == ID){
+		p1 = id(p1,env);	
+	}
+
+	assert(p1->type == POINT);
+
+	int x = p1->expr->point.x->expr->num;
+    int y = p1->expr->point.y->expr->num;
+	
 	fprintf(f,"			ctx.moveTo(%d,%d);\n",x,y);
 	struct expr *next = dr->expr->path.next;
 	while(next){
@@ -134,34 +149,11 @@ void draw_path(struct expr * dr, struct env * env){
 			next = next->expr->path.next;
 		
 	}	
-	fprintf(f,"			ctx.stroke();\n");
-	fprintf(f,"		} else {\n");
-	fprintf(f,"			alert('You need Safari or Firefox 1.5+ to see this demo.');\n");  
-	fprintf(f,"		}\n");
-	fprintf(f,"	}\n");
-	fprintf(f,"</script>\n");
-	fprintf(f,"</head>\n");
-	fprintf(f,"<body onload=\"drawShape();\">\n");
-	fprintf(f,"		<canvas id=\"mycanvas\"></canvas>\n");
-	fprintf(f,"</body>\n");
-	fprintf(f,"</html>\n");
-	fclose(f);
-	printf("file PATH.html created !\n");
-
-
-
-
-	
+		
 
 }
 
-void draw_circle(struct expr * dr,struct env *env){
-	char * name = "CIRCLE.html";
-	FILE *f;
-	f = fopen(name,"w");
-	if(f == NULL){	
-		f = fopen(name,"wb");
-	}
+void draw_circle(struct expr * dr,struct env *env,FILE *f){
 	struct expr *p1 = dr->expr->circle.center;
 	while(p1->type == ID){
 		p1 = id(p1,env);	
@@ -181,29 +173,7 @@ void draw_circle(struct expr * dr,struct env *env){
 
 
 
-	fprintf(f,"<!DOCTYPE HTML>\n");
-	fprintf(f,"<html>\n");
-	fprintf(f,"<head>\n");
-	fprintf(f,"<script type=\"text/javascript\">\n");
-	fprintf(f,"function drawShape(){\n");
-	fprintf(f,"		var canvas = document.getElementById('mycanvas');\n");
-	fprintf(f,"		if (canvas.getContext){\n");
-	fprintf(f,"			var ctx = canvas.getContext('2d');\n");
-	fprintf(f,"			ctx.beginPath();\n");
 	fprintf(f,"			ctx.arc(%d,%d,%d,0,2*Math.PI);\n",x,y,r);
-	fprintf(f,"			ctx.stroke();\n");
-	fprintf(f,"		} else {\n");
-	fprintf(f,"			alert('You need Safari or Firefox 1.5+ to see this demo.');\n");  
-	fprintf(f,"		}\n");
-	fprintf(f,"	}\n");
-	fprintf(f,"</script>\n");
-	fprintf(f,"</head>\n");
-	fprintf(f,"<body onload=\"drawShape();\">\n");
-	fprintf(f,"		<canvas id=\"mycanvas\"></canvas>\n");
-	fprintf(f,"</body>\n");
-	fprintf(f,"</html>\n");
-	fclose(f);
-	printf("file CIRCLE.html created !\n");
 
 
 
@@ -212,13 +182,7 @@ void draw_circle(struct expr * dr,struct env *env){
 }
 
 
-void draw_bezier(struct expr * dr,struct env *env){
-	char * name = "BEZIER.html";
-	FILE *f;
-	f = fopen(name,"w");
-	if(f == NULL){	
-		f = fopen(name,"wb");
-	}
+void draw_bezier(struct expr * dr,struct env *env, FILE *f){
    	struct expr *p1 = dr->expr->bezier.pt1;
 	while(p1->type == ID){
 		p1 = id(p1,env);	
@@ -233,15 +197,6 @@ void draw_bezier(struct expr * dr,struct env *env){
 
 
 
-	fprintf(f,"<!DOCTYPE HTML>\n");
-	fprintf(f,"<html>\n");
-	fprintf(f,"<head>\n");
-	fprintf(f,"<script type=\"text/javascript\">\n");
-	fprintf(f,"function drawShape(){\n");
-	fprintf(f,"		var canvas = document.getElementById('mycanvas');\n");
-	fprintf(f,"		if (canvas.getContext){\n");
-	fprintf(f,"			var ctx = canvas.getContext('2d');\n");
-	fprintf(f,"			ctx.beginPath();\n");
 	fprintf(f,"			ctx.moveTo(%d,%d);\n",x1,y1);
 	fprintf(f,"			ctx.bezierCurveTo(");
 	struct expr *next = dr->expr->bezier.next;
@@ -266,45 +221,70 @@ void draw_bezier(struct expr * dr,struct env *env){
 		
 	}
 	fprintf(f,");\n");
-	fprintf(f,"			ctx.stroke();\n");
-	fprintf(f,"		} else {\n");
-	fprintf(f,"			alert('You need Safari or Firefox 1.5+ to see this demo.');\n");  
-	fprintf(f,"		}\n");
-	fprintf(f,"	}\n");
-	fprintf(f,"</script>\n");
-	fprintf(f,"</head>\n");
-	fprintf(f,"<body onload=\"drawShape();\">\n");
-	fprintf(f,"		<canvas id=\"mycanvas\"></canvas>\n");
-	fprintf(f,"</body>\n");
-	fprintf(f,"</html>\n");
-	fclose(f);
-	printf("file BEZIER.html created !\n");
-
+	
 
 
 	
 
 }
 
-
-
-void drawing(struct expr * dr, struct env *env){
+void draw(struct expr * dr, struct env *env,FILE *f){
+	char test[12][12] = {"ID", "FUN", "APP", "NUM", "OP", "COND", "CELL", "NIL", "POINT", "PATH", "CIRCLE","BEZIER"};
 	switch(dr->type){
-		case PATH:
-			draw_path(dr,env);
+		case PATH:{
+			draw_path(dr,env,f);
 			return;
-		case CIRCLE:
-			draw_circle(dr,env);
+				  }
+		case CIRCLE:{
+			draw_circle(dr,env,f);
 			return;
-		case BEZIER:
-			draw_bezier(dr,env);
+					}
+		case BEZIER:{
+			draw_bezier(dr,env,f);
 			return;
+					}
+		case CELL:{
+			struct expr *next = dr->expr->cell.next;
+			struct expr *image = dr->expr->cell.ex;
 
-		default:
-			printf("not a drawble object\n");
+			while(image->type == ID){
+					image = id(image,env);			
+			 }
+
+			
+			draw(image,env,f);
+			if(next){
+				draw(next,env,f);
+			}
+
 			return;
+				  }
+		case NIL:{
+			return;
+				 }
+		default:{
+			printf("------->%s is not a drawble object\n",test[dr->type]);
+			return;
+				}
 	
 	}
+
+
+
+}
+
+void map(struct expr * dr, struct env *env){
+	char * name = "output.html";
+	FILE *f;
+	f = fopen(name,"w");
+	if(f == NULL){	
+		f = fopen(name,"wb");
+	}
+	html_head(f);
+	draw(dr,env,f);
+	html_tail(f);
+	printf("output.html created\n");
+
 
 }
 
@@ -352,77 +332,80 @@ struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
   	struct expr * p1 ;
 	struct expr *next;
 	char test[12][12] = {"ID", "FUN", "APP", "NUM", "OP", "COND", "CELL", "NIL", "POINT", "PATH", "CIRCLE","BEZIER"};
-	printf("------->%s\n",test[fig->type]);
 
 
-  switch (fig->type){
+	switch (fig->type){
 
-  case POINT:
-    trans_point(fig,vect,env);
-	return fig;
-  case PATH:
-	   p1 = fig->expr->path.point;
-	  
-		while(p1->type == ID){
-			p1 = id(p1,env);
+	  case POINT:
+		trans_point(fig,vect,env);
+		return fig;
+	  case PATH:
+		   p1 = fig->expr->path.point;
+		  
+			while(p1->type == ID){
+				p1 = id(p1,env);
+				}
+
+		
+		trans_point(p1,vect,env);
+		next = fig->expr->path.next;
+
+		while(next){
+			p1 = next->expr->path.point;
+			 
+			while(p1->type == ID){
+				p1 = id(p1,env);
+				
+			}
+			trans_point(p1,vect,env);
+			next = next->expr->path.next;
+
+		
+		}
+
+		return fig;	
+
+	  case CIRCLE:
+			p1 = fig->expr->circle.center;
+		   
+			while(p1->type == ID){
+				p1 = id(p1,env);
+			
 			}
 
-	
-	trans_point(p1,vect,env);
-	next = fig->expr->path.next;
-
-	while(next){
-		p1 = next->expr->path.point;
-		 
-		while(p1->type == ID){
-			p1 = id(p1,env);
 			
-		}
-		trans_point(p1,vect,env);
-		next = next->expr->path.next;
+			trans_point(p1,vect,env);
+			return fig;
 
-	
-	}
 
-	return fig;	
-
-  case CIRCLE:
-		p1 = fig->expr->circle.center;
-	   
-		while(p1->type == ID){
-			p1 = id(p1,env);
-		
-		}
+	  case BEZIER:
+			p1 = fig->expr->bezier.pt1;
+			while(p1->type == ID){
+				p1 = id(p1,env);
+			}
 
 		
-		trans_point(p1,vect,env);
-		return fig;
+			trans_point(p1,vect,env);
+			next = fig->expr->bezier.next;
 
+			while(next){
+				p1 = next->expr->bezier.pt1;
+				while(p1->type == ID){
+					p1 = id(p1,env);
+				}
+				trans_point(p1,vect,env);
+				next = next->expr->bezier.next;
 
-  case BEZIER:
-		p1 = fig->expr->bezier.pt1;
-		while(p1->type == ID){
-			p1 = id(p1,env);
-		}
+			
+			}
 
-	
-	trans_point(p1,vect,env);
-	next = fig->expr->bezier.next;
-
-	while(next){
-		p1 = next->expr->bezier.pt1;
-		while(p1->type == ID){
-			p1 = id(p1,env);
-		}
-		trans_point(p1,vect,env);
-		next = next->expr->bezier.next;
-
-	
-	}
-
-	return fig;	
+			return fig;	
   
-  
+		default:
+			printf("------->%s is not a image object\n",test[fig->type]);
+			return fig;
+
+
   
   }
 }
@@ -498,7 +481,7 @@ void step(struct configuration *conf){
      switch(expr->expr->op){
 	 case DRAW:
 		 eval_arg(conf,arg1);
-		 drawing(conf->closure->expr ,conf->closure->env);
+		 map(conf->closure->expr ,conf->closure->env);
 		 return;
      case NOT: 
        eval_arg(conf,arg1);
