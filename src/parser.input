@@ -113,7 +113,7 @@ let pb = {40,50};
 let pc = {60,70};
 let pd = pa--pb--pc;
 
-translation(pd,{10,20});
+translate(pd,{10,20});
 
 
 
@@ -123,7 +123,7 @@ let bc = {200,100};
 let bd = {200,20};
 let bg = Bezier(ba,bb,bc,bd);
 
-translation(bg,{10,20});
+translate(bg,{10,20});
 
 
 
@@ -131,7 +131,7 @@ translation(bg,{10,20});
 let ca = {100,50};
 let cc = Cercle(ca,50);
 
-translation(cc,{10,20});
+translate(cc,{10,20});
 Draw([cc,bg,pd]);
 
 
