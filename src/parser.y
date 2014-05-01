@@ -61,8 +61,7 @@
 %nonassoc T_NOT T_POP T_NEXT 
 %left T_PLUS T_MINUS
 %left T_MULT T_DIV 
-%left FUNCTION_APPLICATION  T_NUM T_ID '{' '(' '[' 
-
+%left FUNCTION_APPLICATION T_NUM T_ID '{' '(' '[' 
 
 /* Déclaration des types*/
 %type<expr> e arg_list  list 
@@ -77,14 +76,12 @@
  /*GRAMMAIRE UTILISEE*/
 
  /*Terminal*/
-s       :s e[expr] FIN_EXPR {conf->closure = mk_closure($expr,env); conf->stack=NULL; step(conf); print_exp(conf);
-    
- }
-|s en FIN_EXPR				   {env = $2;}
-|s T_PRINT FIN_EXPR			   {$2[strlen($2)-1] = 0;printf("%s\n",$2);}
-|s T_DRAW '(' e[d] ')' FIN_EXPR   {conf->closure = mk_closure(mk_app(mk_op(DRAW),$d),env); conf->stack=NULL; step(conf);}	
-|
-;
+s       :s e[expr] FIN_EXPR {conf->closure = mk_closure($expr,env); conf->stack=NULL; step(conf); print_exp(conf);}
+		|s en FIN_EXPR				   {env = $2;}
+		|s T_PRINT FIN_EXPR			   {$2[strlen($2)-1] = 0;printf("%s\n",$2);}
+		|s T_DRAW '(' e[d] ')' FIN_EXPR   {conf->closure = mk_closure(mk_app(mk_op(DRAW),$d),env); conf->stack=NULL; step(conf);}	
+		|
+		;
 
 /*Variable d'environnement lors de l'affectation de variables*/
 en  :T_LET T_ID[x] T_EQUAL e[expr]                                  {$$ = push_rec_env($x,$expr,env);}
@@ -127,14 +124,6 @@ e   : e T_MINUS e                                          { $$ = mk_app(mk_app(
 	|  e[fun] e[arg] %prec FUNCTION_APPLICATION            { $$ = mk_app($fun,$arg);}/*Exécution de fonctions à plusieurs variables*/
 	| '(' e ')'                                            { $$ = $2;}/*Ignorer les parentheses inutiles*/
     ;
-/*Boucle pour plusieurs paramtres d'une fonction*/
-
-
-
-
-/*f_arg :e                                                            {$$ = $1;}*/
-      /*|f_arg[fun] e[arg]                                            {$$ = mk_app($fun,$arg);}*/
-      /*;*/
 
 
 
@@ -143,15 +132,18 @@ arg_list:T_ARROW e                                                  {$$=$2;}
         |T_ID[var] arg_list                                         {$$=mk_fun ($1, $2); }
         ;
 
+
 list	: e[ex]					{$$ = mk_cell($ex,mk_nil());}
-		| e[ex] ',' list[l]		{$$ = mk_cell($ex,$l);}
-		|	     				{$$ = mk_nil();}
+		| e[ex] ',' list[l] 	{$$ = mk_cell($ex,$l);}
+		|	      				{$$ = mk_nil();}
 		;
 
 %%
 
 int main(int argc, char *argv[])
 {
+
+
       yyparse();
 
   return EXIT_SUCCESS;

@@ -49,8 +49,8 @@
 
 [(),\[\]{}]         {return yytext[0];}
 [[:space:]] ;
-[[:digit:]]+ {yylval.num = atoi(yytext); return T_NUM;}
-[a-zA-z]+    {yylval.id = strdup (yytext); return T_ID;}
+[0-9]+ {yylval.num = atoi(yytext); return T_NUM;}
+[[:alpha:]_]+    {yylval.id = strdup (yytext); return T_ID;}
 
 
 .               {ECHO; yyerror ("unexpected character");}
