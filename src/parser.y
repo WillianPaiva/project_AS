@@ -19,7 +19,20 @@
      printf(">>> %d\n",conf->closure->expr->expr->num);
    }
     if(conf->closure->expr->type==POINT){
-     printf(">>> POINT X=%d Y=%d \n", conf->closure->expr->expr->point.x->expr->num, conf->closure->expr->expr->point.y->expr->num);
+
+		struct expr * px = conf->closure->expr->expr->point.x;
+		while(px->type == ID){
+			px = id(px,conf->closure->env);
+			
+			}
+
+		struct expr * py = conf->closure->expr->expr->point.y;
+		while(py->type == ID){
+			py = id(py,conf->closure->env);
+			
+		 }
+
+     printf(">>> POINT X=%d Y=%d \n",px->expr->num , py->expr->num );
    }
    }
 

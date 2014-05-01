@@ -308,10 +308,43 @@ void drawing(struct expr * dr, struct env *env){
 
 }
 
-void trans_point(struct expr* p, struct expr* v){
+void trans_point(struct expr* p, struct expr* v, struct env *env){
   assert(p->type == POINT && v->type == POINT);
-  p->expr->point.x->expr->num +=  v->expr->point.x->expr->num;
-  p->expr->point.y->expr->num +=  v->expr->point.y->expr->num;
+
+  struct expr * px = p->expr->point.x;
+  while(px->type == ID){
+			px = id(px,env);
+			
+	}
+
+  struct expr * py = p->expr->point.y;
+  while(py->type == ID){
+			py = id(py,env);
+			
+  }
+  struct expr * vx = v->expr->point.x;
+  while(vx->type == ID){
+			vx = id(vx,env);
+			
+	}
+
+  struct expr * vy = v->expr->point.y;
+  while(vy->type == ID){
+			vy = id(vy,env);
+			
+  }
+
+
+
+
+
+
+
+
+
+
+  px->expr->num +=  vx->expr->num;
+  py->expr->num +=  vy->expr->num;
 
 }
 
@@ -325,33 +358,27 @@ struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
   switch (fig->type){
 
   case POINT:
-    trans_point(fig,vect);
+    trans_point(fig,vect,env);
 	return fig;
   case PATH:
 	   p1 = fig->expr->path.point;
-	   printf("------->%s\n",test[p1->type]);
-
+	  
 		while(p1->type == ID){
 			p1 = id(p1,env);
-			printf("------->%s\n",test[p1->type]);
-
-		}
+			}
 
 	
-	trans_point(p1,vect);
+	trans_point(p1,vect,env);
 	next = fig->expr->path.next;
 
 	while(next){
 		p1 = next->expr->path.point;
-		 printf("------->%s\n",test[p1->type]);
-
+		 
 		while(p1->type == ID){
 			p1 = id(p1,env);
-			printf("------->%s\n",test[p1->type]);
-
+			
 		}
-		assert(p1->type = POINT);
-		trans_point(p1,vect);
+		trans_point(p1,vect,env);
 		next = next->expr->path.next;
 
 	
@@ -361,16 +388,14 @@ struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
 
   case CIRCLE:
 		p1 = fig->expr->circle.center;
-	   printf("------->%s\n",test[p1->type]);
-
+	   
 		while(p1->type == ID){
 			p1 = id(p1,env);
-			printf("------->%s\n",test[p1->type]);
-
+		
 		}
 
 		
-		trans_point(p1,vect);
+		trans_point(p1,vect,env);
 		return fig;
 
 
@@ -381,7 +406,7 @@ struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
 		}
 
 	
-	trans_point(p1,vect);
+	trans_point(p1,vect,env);
 	next = fig->expr->bezier.next;
 
 	while(next){
@@ -389,7 +414,7 @@ struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
 		while(p1->type == ID){
 			p1 = id(p1,env);
 		}
-		trans_point(p1,vect);
+		trans_point(p1,vect,env);
 		next = next->expr->bezier.next;
 
 	
