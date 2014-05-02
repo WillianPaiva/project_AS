@@ -111,15 +111,13 @@ void html_head(FILE *f){
 	fprintf(f,"		canvas.height = 800\n");
 	fprintf(f,"		if (canvas.getContext){\n");
 	fprintf(f,"			var ctx = canvas.getContext('2d');\n");
-	fprintf(f,"			ctx.beginPath();\n");
-
+	
 }
 
 
 void html_tail(FILE *f){
 
 	
-	fprintf(f,"			ctx.stroke();\n");
 	fprintf(f,"		} else {\n");
 	fprintf(f,"			alert('You need Safari or Firefox 1.5+ to see this demo.');\n");  
 	fprintf(f,"		}\n");
@@ -142,6 +140,7 @@ void draw_path(struct expr * dr, struct env * env,FILE *f){
 
 	int x = p1->expr->point.x->expr->num;
     int y = p1->expr->point.y->expr->num;
+	fprintf(f,"			ctx.beginPath();\n");
 	
 	fprintf(f,"			ctx.moveTo(%d,%d);\n",x,y);
 	struct expr *next = dr->expr->path.next;
@@ -157,6 +156,7 @@ void draw_path(struct expr * dr, struct env * env,FILE *f){
 			next = next->expr->path.next;
 		
 	}	
+	fprintf(f,"			ctx.stroke();\n");
 		
 
 }
@@ -180,9 +180,11 @@ void draw_circle(struct expr * dr,struct env *env,FILE *f){
 
 
 
+	fprintf(f,"			ctx.beginPath();\n");
 
 	fprintf(f,"			ctx.arc(%d,%d,%d,0,2*Math.PI);\n",x,y,r);
 
+	fprintf(f,"			ctx.stroke();\n");
 
 
 	
@@ -203,6 +205,7 @@ void draw_bezier(struct expr * dr,struct env *env, FILE *f){
 
 
 
+	fprintf(f,"			ctx.beginPath();\n");
 
 
 	fprintf(f,"			ctx.moveTo(%d,%d);\n",x1,y1);
@@ -230,6 +233,7 @@ void draw_bezier(struct expr * dr,struct env *env, FILE *f){
 	}
 	fprintf(f,");\n");
 	
+	fprintf(f,"			ctx.stroke();\n");
 
 
 	
