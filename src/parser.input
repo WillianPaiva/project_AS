@@ -128,11 +128,16 @@ translate(bg,{10,20});
 
 
 
-let ca = {100,50};
+let ca = {75,50};
 let cc = Cercle(ca,50);
 
-translate(cc,{10,20});
-Draw([cc,bg,pd]);
+let a = translate(cc,{0,20});
+let b = translate(cc,{0,40});
+let c = translate(cc,{0,60});
+let d = translate(cc,{0,80});
+let e = translate(cc,{0,100});
+
+Draw([a,b,c,d,e]);
 
 
 

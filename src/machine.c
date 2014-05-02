@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <assert.h>
 #include "../interface/machine.h"
+#include <math.h>
+
+#define PI 3.14159265
 
 #define MAX_CLOSURE 1000000
 
@@ -13,6 +16,12 @@ int get_num(struct closure *cl){
   int res =  cl->expr->expr->num;
   return res;
 } 
+
+struct expr * get_point(struct closure *cl){
+  struct expr *res =  cl->expr;
+  return res;
+} 
+
 
 
 void eval_arg(struct configuration *conf, struct closure *arg){
@@ -288,6 +297,42 @@ void map(struct expr * dr, struct env *env){
 
 }
 
+void Rotate_point(struct expr* p, struct expr* v, int angle, struct env *env)
+{ 
+	  assert(p->type == POINT && v->type == POINT);
+
+	  struct expr * px = p->expr->point.x;
+	  while(px->type == ID){
+				px = id(px,env);
+				
+		}
+
+	  struct expr * py = p->expr->point.y;
+	  while(py->type == ID){
+				py = id(py,env);
+				
+	  }
+	  struct expr * vx = v->expr->point.x;
+	  while(vx->type == ID){
+				vx = id(vx,env);
+				
+		}
+
+	  struct expr * vy = v->expr->point.y;
+	  while(vy->type == ID){
+				vy = id(vy,env);
+				
+	  }
+	int refx = vx->expr->num;
+	int refy =vy->expr->num;
+	int x = px->expr->num ;
+	int y =	py->expr->num;
+	float theta = angle*(PI/180);
+    px->expr->num = refy + (x-refx)*cos(theta)-(y-refy)*sin(theta);
+	py->expr->num = refy + (x-refx)*sin(theta)+(y-refy)*cos(theta);
+
+}
+
 void trans_point(struct expr* p, struct expr* v, struct env *env){
   assert(p->type == POINT && v->type == POINT);
 
@@ -311,7 +356,6 @@ void trans_point(struct expr* p, struct expr* v, struct env *env){
   struct expr * vy = v->expr->point.y;
   while(vy->type == ID){
 			vy = id(vy,env);
-			
   }
 
 
@@ -331,16 +375,18 @@ void trans_point(struct expr* p, struct expr* v, struct env *env){
 struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
   	struct expr * p1 ;
 	struct expr *next;
+	struct expr *newfig	= fig;
+
 	char test[12][12] = {"ID", "FUN", "APP", "NUM", "OP", "COND", "CELL", "NIL", "POINT", "PATH", "CIRCLE","BEZIER"};
 
 
-	switch (fig->type){
+	switch (newfig->type){
 
 	  case POINT:
-		trans_point(fig,vect,env);
-		return fig;
+		trans_point(newfig,vect,env);
+		return newfig;
 	  case PATH:
-		   p1 = fig->expr->path.point;
+		   p1 = newfig->expr->path.point;
 		  
 			while(p1->type == ID){
 				p1 = id(p1,env);
@@ -348,7 +394,7 @@ struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
 
 		
 		trans_point(p1,vect,env);
-		next = fig->expr->path.next;
+		next = newfig->expr->path.next;
 
 		while(next){
 			p1 = next->expr->path.point;
@@ -363,10 +409,10 @@ struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
 		
 		}
 
-		return fig;	
+		return newfig;	
 
 	  case CIRCLE:
-			p1 = fig->expr->circle.center;
+			p1 = newfig->expr->circle.center;
 		   
 			while(p1->type == ID){
 				p1 = id(p1,env);
@@ -375,18 +421,18 @@ struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
 
 			
 			trans_point(p1,vect,env);
-			return fig;
+			return newfig;
 
 
 	  case BEZIER:
-			p1 = fig->expr->bezier.pt1;
+			p1 = newfig->expr->bezier.pt1;
 			while(p1->type == ID){
 				p1 = id(p1,env);
 			}
 
 		
 			trans_point(p1,vect,env);
-			next = fig->expr->bezier.next;
+			next = newfig->expr->bezier.next;
 
 			while(next){
 				p1 = next->expr->bezier.pt1;
@@ -399,11 +445,11 @@ struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
 			
 			}
 
-			return fig;	
+			return newfig;	
   
 		default:
-			printf("------->%s is not a image object\n",test[fig->type]);
-			return fig;
+			printf("------->%s is not a image object\n",test[newfig->type]);
+			return newfig;
 
 
   
@@ -578,10 +624,10 @@ void step(struct configuration *conf){
        return;
      case TRANS:
 	   eval_arg(conf,arg1);
-       t1 = conf->closure->expr;
+       t1 = get_point(conf->closure);
        eval_arg(conf,arg2);
-       t2 = conf->closure->expr;
-       conf->closure = mk_closure(translater(t1,t2,conf->closure->env),arg1->env);
+       t2 = get_point(conf->closure);
+       conf->closure = mk_closure(translater(t1,t2,conf->closure->env),NULL);
 	 return;
      default: assert(0);
      }   
