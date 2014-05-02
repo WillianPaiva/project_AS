@@ -127,16 +127,23 @@ let bg = rotate(Bezier(ba,bb,bc,bd),bc,190);
 
 
 
-let ca = {75,50};
-let cc = Cercle(ca,50);
+let ca = {150,150};
+let cc = Cercle(ca,80);
 
-let a = translate(cc,{0,20});
-let b = translate(cc,{0,40});
-let c = translate(cc,{0,60});
-let d = translate(cc,{0,80});
-let e = translate(cc,{0,100});
+let a = rotation(translate(cc,{0,20}),ca,-30);
+let b = rotation(translate(a,{0,20}),ca,-30);
+let c = rotation(translate(b,{0,20}),ca,-30);
+let d = rotation(translate(c,{0,20}),ca,-30);
+let e = rotation(translate(d,{0,20}),ca,-30);
+let f = rotation(translate(e,{0,20}),ca,-30);
+let g = rotation(translate(f,{0,20}),ca,-30);
+let h = rotation(translate(g,{0,20}),ca,-30);
+let i = rotation(translate(h,{0,20}),ca,-30);
+let j = rotation(translate(i,{0,20}),ca,-30);
+let k = rotation(translate(j,{0,20}),ca,-30);
+let l = rotation(translate(k,{0,20}),ca,-30);
 
-Draw([a,b,c,d,e,pd,bg,cc]);
+Draw([a,b,c,d,e,f,g,h,i,j,k,l]);
 
 
 
