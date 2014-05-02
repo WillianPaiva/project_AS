@@ -35,6 +35,13 @@
      printf(">>> POINT X=%d Y=%d \n",px->expr->num , py->expr->num );
    }
    }
+   struct expr * step_conf(struct expr *ex){
+			conf->closure = mk_closure(ex,env);
+			conf->stack=NULL;
+			step(conf);
+			return conf->closure->expr;
+   
+   }
 
 %}
 
@@ -76,10 +83,9 @@
  /*GRAMMAIRE UTILISEE*/
 
  /*Terminal*/
-s       :s e[expr] FIN_EXPR {conf->closure = mk_closure($expr,env); conf->stack=NULL; step(conf); print_exp(conf);}
+s       :s e[expr] FIN_EXPR {step_conf($expr); print_exp(conf);}
 		|s en FIN_EXPR				   {env = $2;}
 		|s T_PRINT FIN_EXPR			   {$2[strlen($2)-1] = 0;printf("%s\n",$2);}
-		|s T_DRAW '(' e[d] ')' FIN_EXPR   {conf->closure = mk_closure(mk_app(mk_op(DRAW),$d),env); conf->stack=NULL; step(conf);}	
 		|
 		;
 
@@ -94,18 +100,15 @@ en  :T_LET T_ID[x] T_EQUAL e[expr]                                  {$$ = push_r
 e   : e T_MINUS e                                          { $$ = mk_app(mk_app(mk_op(MINUS),$1),$3);}
 	| T_NUM												   { $$ = mk_int($1);}
 	| T_MINUS e											   { $$ = mk_app(mk_app(mk_op(MULT),mk_int(-1)),$2);}
+	| T_DRAW '(' e[d] ')'								   { $$ = mk_app(mk_op(DRAW),$d); }	
 	| T_POP e[l]										   { $$ = mk_app(mk_op(POP),$l);}
 	| T_NEXT e[l]										   { $$ = mk_app(mk_op(NEXT),$l);}
 	|'{' e[x] ',' e[y] '}'								   { $$ = mk_point($x,$y);}	
 	| T_BEZIER '(' e[p1] ',' e[p2] ',' e[p3] ',' e[p4] ')' { $$ = mk_bezier($p1,mk_bezier($p2,mk_bezier($p3,mk_bezier($p4,NULL))));}
 	| T_CIRCLE '(' e[c] ',' e[r] ')'                       { $$ = mk_circle($c,$r);}
-        | T_TRANS '(' e[fig] ',' e[vect] ')'				   {conf->closure = mk_closure(mk_app(mk_app(mk_op(TRANS),$fig),$vect),env);
-															conf->stack=NULL; step(conf);  $$ = conf->closure->expr ;}
-        | T_ROT '(' e[fig] ',' e[centre] ',' e[rap] ')'		   {conf->closure = mk_closure(mk_app(mk_app(mk_app(mk_op(ROT),$fig),$centre),$rap),env);
-															conf->stack=NULL; step(conf);  $$ = conf->closure->expr ;}
-
-        | T_HOM '(' e[fig] ',' e[centre] ',' e[rap] ')'		   {conf->closure = mk_closure(mk_app(mk_app(mk_app(mk_op(HOM),$fig),$centre),$rap),env);
-															conf->stack=NULL; step(conf);  $$ = conf->closure->expr ;}
+    | T_TRANS '(' e[fig] ',' e[vect] ')'				   { $$ = step_conf(mk_app(mk_app(mk_op(TRANS),$fig),$vect));}
+    | T_ROT '(' e[fig] ',' e[centre] ',' e[rap] ')'		   { $$ = step_conf(mk_app(mk_app(mk_app(mk_op(ROT),$fig),$centre),$rap));}
+    | T_HOM '(' e[fig] ',' e[centre] ',' e[rap] ')'		   { $$ = step_conf(mk_app(mk_app(mk_app(mk_op(HOM),$fig),$centre),$rap));}
 	| e T_PATH e                                           { $$ = mk_path($1,mk_path($3,NULL));}
 	| e T_PLUS e                                           { $$ = mk_app(mk_app(mk_op(PLUS),$1),$3);}
 	| e T_DIV e                                            { $$ = mk_app(mk_app(mk_op(DIV),$1),$3);}
@@ -146,6 +149,8 @@ list	: e[ex]					{$$ = mk_cell($ex,mk_nil());}
 
 int main(int argc, char *argv[])
 {
+	extern int yydebug;
+	yydebug = 1;
 
       yyparse();
 

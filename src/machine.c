@@ -111,8 +111,8 @@ void html_head(FILE *f){
 	fprintf(f,"<script type=\"text/javascript\">\n");
 	fprintf(f,"function drawShape(){\n");
 	fprintf(f,"		var canvas = document.getElementById('mycanvas');\n");
-	fprintf(f,"		canvas.width = 800\n");
-	fprintf(f,"		canvas.height = 800\n");
+	fprintf(f,"		canvas.width = 1500\n");
+	fprintf(f,"		canvas.height = 1500\n");
 	fprintf(f,"		if (canvas.getContext){\n");
 	fprintf(f,"			var ctx = canvas.getContext('2d');\n");
 	
@@ -246,6 +246,8 @@ void draw_bezier(struct expr * dr,struct env *env, FILE *f){
 
 void draw(struct expr * dr, struct env *env,FILE *f){
 	char test[12][12] = {"ID", "FUN", "APP", "NUM", "OP", "COND", "CELL", "NIL", "POINT", "PATH", "CIRCLE","BEZIER"};
+	struct expr *temp = dr;
+
 	switch(dr->type){
 	case PATH:{
 	  draw_path(dr,env,f);
@@ -261,12 +263,7 @@ void draw(struct expr * dr, struct env *env,FILE *f){
 	}
 	case CELL:{
 	  struct expr *next = dr->expr->cell.next;
-	  struct expr *image = dr->expr->cell.ex;
-	  
-	  while(image->type == ID){
-	    image = id(image,env);			
-	  }
-	  
+	  struct expr *image = dr->expr->cell.ex;	  
 	  
 	  draw(image,env,f);
 	  if(next){
@@ -275,6 +272,14 @@ void draw(struct expr * dr, struct env *env,FILE *f){
 	  
 	  return;
 	}
+	case ID:{
+	while(temp->type == ID){
+	    temp = id(temp,env);			
+	  }
+		draw(temp,env,f);
+		return;
+
+			}
 	case NIL:{
 	  return;
 	}
@@ -572,11 +577,12 @@ struct expr* scale_point(struct expr* p, struct expr* v, int ratio, struct env *
 				vy = id(vy,env);
 				
 	  }
+	  float rat = (float)ratio/10;
 	int refx = vx->expr->num;
 	int refy =vy->expr->num;
 	int x = px->expr->num ;
 	int y =	py->expr->num;
-	return mk_point(mk_int(ratio*(x-refx)+refx),mk_int(ratio*(y-refy)+refy));
+	return mk_point(mk_int(rat*(x-refx)+refx),mk_int(rat*(y-refy)+refy));
 
 }
 
@@ -584,7 +590,6 @@ struct expr *scale(struct expr* fig, struct expr* vect,int ratio, struct env *en
   	struct expr * p1 ;
 	struct expr *next;
 	struct expr *newfig	;
-	printf("------------%d\n",ratio);
 	char test[12][12] = {"ID", "FUN", "APP", "NUM", "OP", "COND", "CELL", "NIL", "POINT", "PATH", "CIRCLE","BEZIER"};
 
 	switch (fig->type){
@@ -625,9 +630,10 @@ struct expr *scale(struct expr* fig, struct expr* vect,int ratio, struct env *en
 				p1 = id(p1,env);
 			
 			}
+			float rat = (float)ratio/10;
 
 			
-			newfig = mk_circle(scale_point(p1,vect,ratio,env),mk_int(ratio*(fig->expr->circle.radius->expr->num)));
+			newfig = mk_circle(scale_point(p1,vect,ratio,env),mk_int(rat*(fig->expr->circle.radius->expr->num)));
 			return newfig;
 
 	  case BEZIER:
