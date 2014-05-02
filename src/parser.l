@@ -44,8 +44,8 @@
 "tl" return T_NEXT;
 "::" return T_PUSH;
 "translate" return T_TRANS;
-"rotation" return T_ROT;
-"homotetie" return T_HOM;
+"rotate" return T_ROT;
+"scale" return T_HOM;
 
 [(),\[\]{}]         {return yytext[0];}
 [[:space:]] ;

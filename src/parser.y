@@ -55,7 +55,7 @@
 
  /*Priorités nécessaires*/
 %nonassoc T_EQUAL T_ARROW T_LET T_FUN T_IF T_THEN T_WHERE T_IN T_ELSE 
-%left  T_LEQ T_LE T_GE T_GEQ T_EQ T_PUSH T_TRANS T_ROT
+%left  T_LEQ T_LE T_GE T_GEQ T_EQ T_PUSH T_TRANS T_ROT T_HOM
 %left T_OR 
 %left T_AND T_PATH T_BEZIER T_CIRCLE 
 %nonassoc T_NOT T_POP T_NEXT 
@@ -99,12 +99,13 @@ e   : e T_MINUS e                                          { $$ = mk_app(mk_app(
 	|'{' e[x] ',' e[y] '}'								   { $$ = mk_point($x,$y);}	
 	| T_BEZIER '(' e[p1] ',' e[p2] ',' e[p3] ',' e[p4] ')' { $$ = mk_bezier($p1,mk_bezier($p2,mk_bezier($p3,mk_bezier($p4,NULL))));}
 	| T_CIRCLE '(' e[c] ',' e[r] ')'                       { $$ = mk_circle($c,$r);}
-    | T_TRANS '(' e[fig] ',' e[vect] ')'				   {conf->closure = mk_closure(mk_app(mk_app(mk_op(TRANS),$fig),$vect),env);
+        | T_TRANS '(' e[fig] ',' e[vect] ')'				   {conf->closure = mk_closure(mk_app(mk_app(mk_op(TRANS),$fig),$vect),env);
 															conf->stack=NULL; step(conf);  $$ = conf->closure->expr ;}
-	| T_ROT '(' e[fig] ',' e[centre] ',' e[rap] ')'		   {conf->closure = mk_closure(mk_app(mk_app(mk_app(mk_op(ROT),$fig),$centre),$rap),env);
+        | T_ROT '(' e[fig] ',' e[centre] ',' e[rap] ')'		   {conf->closure = mk_closure(mk_app(mk_app(mk_app(mk_op(ROT),$fig),$centre),$rap),env);
 															conf->stack=NULL; step(conf);  $$ = conf->closure->expr ;}
 
-/*| T_HOM '(' e[fig] ',' e[centre] ',' e[ration] ')' { }*/
+        | T_HOM '(' e[fig] ',' e[centre] ',' e[rap] ')'		   {conf->closure = mk_closure(mk_app(mk_app(mk_app(mk_op(HOM),$fig),$centre),$rap),env);
+															conf->stack=NULL; step(conf);  $$ = conf->closure->expr ;}
 	| e T_PATH e                                           { $$ = mk_path($1,mk_path($3,NULL));}
 	| e T_PLUS e                                           { $$ = mk_app(mk_app(mk_op(PLUS),$1),$3);}
 	| e T_DIV e                                            { $$ = mk_app(mk_app(mk_op(DIV),$1),$3);}
@@ -145,7 +146,6 @@ list	: e[ex]					{$$ = mk_cell($ex,mk_nil());}
 
 int main(int argc, char *argv[])
 {
-
 
       yyparse();
 

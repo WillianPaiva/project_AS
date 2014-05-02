@@ -121,7 +121,7 @@ let ba = {20,20};
 let bb = {20,100};
 let bc = {200,100};
 let bd = {200,20};
-let bg = rotation(Bezier(ba,bb,bc,bd),bc,190);
+let bg = rotate(Bezier(ba,bb,bc,bd),bc,190);
 
 
 

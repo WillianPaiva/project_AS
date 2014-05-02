@@ -11,7 +11,7 @@
 #define MAX_CLOSURE 1000000
 
 int nb_closure;
-
+//////GET NUMERICAL VALUE
 int get_num(struct closure *cl){
   int res =  cl->expr->expr->num;
   return res;
@@ -23,18 +23,20 @@ struct expr * get_point(struct closure *cl){
 } 
 
 
-
+//////EVALUATION OF CONFIGURATION
 void eval_arg(struct configuration *conf, struct closure *arg){
   conf->closure = arg;
   conf->stack = NULL;
   step(conf);
 }
 
+//////GET CELL FROM CLOSURE
 struct cell get_cell(struct closure * cl){
   assert(cl->expr->type == CELL);
   return cl->expr->expr->cell;
 }
 
+///////MACHINE ENVIRONNEMENT USAGE
 struct closure *mk_closure(struct expr *expr, struct env *env){
   assert(nb_closure<MAX_CLOSURE);
   struct closure *cl = malloc(sizeof(struct closure));
@@ -99,6 +101,8 @@ struct stack *push_stack(struct closure *cl, struct stack *stack){
   st->next = stack;
   return st;
 }
+
+///////DRAWING IMAGE
 void html_head(FILE *f){
 
 	fprintf(f,"<!DOCTYPE HTML>\n");
@@ -295,41 +299,7 @@ void map(struct expr * dr, struct env *env){
 
 }
 
-struct expr* rotate_point(struct expr* p, struct expr* v, int angle, struct env *env)
-{ 
-	  assert(p->type == POINT && v->type == POINT);
-
-	  struct expr * px = p->expr->point.x;
-	  while(px->type == ID){
-				px = id(px,env);
-				
-		}
-
-	  struct expr * py = p->expr->point.y;
-	  while(py->type == ID){
-				py = id(py,env);
-				
-	  }
-	  struct expr * vx = v->expr->point.x;
-	  while(vx->type == ID){
-				vx = id(vx,env);
-				
-		}
-
-	  struct expr * vy = v->expr->point.y;
-	  while(vy->type == ID){
-				vy = id(vy,env);
-				
-	  }
-	int refx = vx->expr->num;
-	int refy =vy->expr->num;
-	int x = px->expr->num ;
-	int y =	py->expr->num;
-	float theta = angle*(PI/180);
-	return mk_point(mk_int(refy + (x-refx)*cos(theta)-(y-refy)*sin(theta)),mk_int(refy + (x-refx)*sin(theta)+(y-refy)*cos(theta)));
-
-}
-
+/////TRANSLATION
 struct expr* trans_point(struct expr* p, struct expr* v, struct env *env){
   assert(p->type == POINT && v->type == POINT);
 
@@ -368,7 +338,7 @@ struct expr* trans_point(struct expr* p, struct expr* v, struct env *env){
 
 }
 
-struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
+struct expr *translate(struct expr* fig, struct expr* vect, struct env *env){
   	struct expr * p1 ;
 	struct expr *next;
 	struct expr *newfig	;
@@ -450,6 +420,42 @@ struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
 
   
   }
+}
+
+/////ROTATION
+struct expr* rotate_point(struct expr* p, struct expr* v, int angle, struct env *env)
+{ 
+	  assert(p->type == POINT && v->type == POINT);
+
+	  struct expr * px = p->expr->point.x;
+	  while(px->type == ID){
+				px = id(px,env);
+				
+		}
+
+	  struct expr * py = p->expr->point.y;
+	  while(py->type == ID){
+				py = id(py,env);
+				
+	  }
+	  struct expr * vx = v->expr->point.x;
+	  while(vx->type == ID){
+				vx = id(vx,env);
+				
+		}
+
+	  struct expr * vy = v->expr->point.y;
+	  while(vy->type == ID){
+				vy = id(vy,env);
+				
+	  }
+	int refx = vx->expr->num;
+	int refy =vy->expr->num;
+	int x = px->expr->num ;
+	int y =	py->expr->num;
+	float theta = angle*(PI/180);
+	return mk_point(mk_int(refy + (x-refx)*cos(theta)-(y-refy)*sin(theta)),mk_int(refy + (x-refx)*sin(theta)+(y-refy)*cos(theta)));
+
 }
 
 struct expr *rotate(struct expr* fig, struct expr* vect,int angle, struct env *env){
@@ -535,6 +541,125 @@ struct expr *rotate(struct expr* fig, struct expr* vect,int angle, struct env *e
   }
 }
 
+///SCALING
+struct expr* scale_point(struct expr* p, struct expr* v, int ratio, struct env *env)
+{ 
+	  assert(p->type == POINT && v->type == POINT);
+
+	  struct expr * px = p->expr->point.x;
+	  while(px->type == ID){
+				px = id(px,env);
+				
+		}
+
+	  struct expr * py = p->expr->point.y;
+	  while(py->type == ID){
+				py = id(py,env);
+				
+	  }
+	  struct expr * vx = v->expr->point.x;
+	  while(vx->type == ID){
+				vx = id(vx,env);
+				
+		}
+
+	  struct expr * vy = v->expr->point.y;
+	  while(vy->type == ID){
+				vy = id(vy,env);
+				
+	  }
+	int refx = vx->expr->num;
+	int refy =vy->expr->num;
+	int x = px->expr->num ;
+	int y =	py->expr->num;
+	return mk_point(mk_int(ratio*(x-refx)+refx),mk_int(ratio*(y-refy)+refy));
+
+}
+
+struct expr *scale(struct expr* fig, struct expr* vect,int ratio, struct env *env){
+  	struct expr * p1 ;
+	struct expr *next;
+	struct expr *newfig	;
+	printf("------------%d\n",ratio);
+	char test[12][12] = {"ID", "FUN", "APP", "NUM", "OP", "COND", "CELL", "NIL", "POINT", "PATH", "CIRCLE","BEZIER"};
+
+	switch (fig->type){
+
+	  case POINT:
+	    newfig =  scale_point(fig,vect,ratio,env);
+		return newfig;
+	  case PATH:
+		   p1 = fig->expr->path.point;
+		  
+			while(p1->type == ID){
+				p1 = id(p1,env);
+			}
+			
+			newfig = mk_path(scale_point(p1,vect,ratio,env),NULL);
+		
+		next = fig->expr->path.next;
+
+		while(next){
+			p1 = next->expr->path.point;
+			 
+			while(p1->type == ID){
+				p1 = id(p1,env);
+				
+			}
+			newfig = mk_path(scale_point(p1,vect,ratio,env),newfig);
+			next = next->expr->path.next;
+
+		
+		}
+
+		return newfig;	
+
+	  case CIRCLE:
+			p1 = fig->expr->circle.center;
+		   
+			while(p1->type == ID){
+				p1 = id(p1,env);
+			
+			}
+
+			
+			newfig = mk_circle(scale_point(p1,vect,ratio,env),mk_int(ratio*(fig->expr->circle.radius->expr->num)));
+			return newfig;
+
+	  case BEZIER:
+			p1 = fig->expr->bezier.pt1;
+			while(p1->type == ID){
+				p1 = id(p1,env);
+			}
+
+			newfig = mk_bezier(scale_point(p1,vect,ratio,env),NULL);
+			
+			next = fig->expr->bezier.next;
+
+			while(next){
+				p1 = next->expr->bezier.pt1;
+				while(p1->type == ID){
+					p1 = id(p1,env);
+				}
+			    
+				newfig = mk_bezier(scale_point(p1,vect,ratio,env),newfig);
+				next = next->expr->bezier.next;
+
+			
+			}
+
+			return newfig;	
+  
+		default:
+			printf("------->%s is not a image object\n",test[fig->type]);
+			return fig;
+
+
+  
+  }
+}
+
+////////STEP
 void step(struct configuration *conf){
   struct expr *expr = conf->closure->expr;
   struct env *env = conf->closure->env;
@@ -706,7 +831,7 @@ void step(struct configuration *conf){
        t1 = get_point(conf->closure);
        eval_arg(conf,arg2);
        t2 = get_point(conf->closure);
-       conf->closure = mk_closure(translater(t1,t2,conf->closure->env),NULL);
+       conf->closure = mk_closure(translate(t1,t2,conf->closure->env),NULL);
        return;
      }
      if(stack==NULL){return;}
@@ -722,6 +847,15 @@ void step(struct configuration *conf){
        eval_arg(conf,arg3);
        t3 = get_num(conf->closure);    
        conf->closure = mk_closure(rotate(t1,t2,t3,conf->closure->env),NULL);
+       return;  
+     case HOM:
+       eval_arg(conf,arg1);
+       t1 = get_point(conf->closure);
+       eval_arg(conf,arg2);
+       t2 = get_point(conf->closure);
+       eval_arg(conf,arg3);
+       t3 = get_num(conf->closure);
+       conf->closure = mk_closure(scale(t1,t2,t3,conf->closure->env),NULL);
        return;  
      default: assert(0);
      }   
