@@ -107,6 +107,8 @@ void html_head(FILE *f){
 	fprintf(f,"<script type=\"text/javascript\">\n");
 	fprintf(f,"function drawShape(){\n");
 	fprintf(f,"		var canvas = document.getElementById('mycanvas');\n");
+	fprintf(f,"		canvas.width = 800\n");
+	fprintf(f,"		canvas.height = 800\n");
 	fprintf(f,"		if (canvas.getContext){\n");
 	fprintf(f,"			var ctx = canvas.getContext('2d');\n");
 	fprintf(f,"			ctx.beginPath();\n");
