@@ -55,7 +55,7 @@
 
  /*Priorités nécessaires*/
 %nonassoc T_EQUAL T_ARROW T_LET T_FUN T_IF T_THEN T_WHERE T_IN T_ELSE 
-%left  T_LEQ T_LE T_GE T_GEQ T_EQ T_PUSH T_TRANS
+%left  T_LEQ T_LE T_GE T_GEQ T_EQ T_PUSH T_TRANS T_ROT
 %left T_OR 
 %left T_AND T_PATH T_BEZIER T_CIRCLE 
 %nonassoc T_NOT T_POP T_NEXT 
@@ -101,7 +101,7 @@ e   : e T_MINUS e                                          { $$ = mk_app(mk_app(
 	| T_CIRCLE '(' e[c] ',' e[r] ')'                       { $$ = mk_circle($c,$r);}
     | T_TRANS '(' e[fig] ',' e[vect] ')'				   {conf->closure = mk_closure(mk_app(mk_app(mk_op(TRANS),$fig),$vect),env);
 															conf->stack=NULL; step(conf);  $$ = conf->closure->expr ;}
-| T_ROT '(' e[fig] ',' e[centre] ',' e[rap] ')'				   {conf->closure = mk_closure(mk_app(mk_app(mk_app(mk_op(ROT),$fig),$centre),$rap),env);
+	| T_ROT '(' e[fig] ',' e[centre] ',' e[rap] ')'		   {conf->closure = mk_closure(mk_app(mk_app(mk_app(mk_op(ROT),$fig),$centre),$rap),env);
 															conf->stack=NULL; step(conf);  $$ = conf->closure->expr ;}
 
 /*| T_HOM '(' e[fig] ',' e[centre] ',' e[ration] ')' { }*/
