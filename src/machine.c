@@ -333,7 +333,7 @@ void Rotate_point(struct expr* p, struct expr* v, int angle, struct env *env)
 
 }
 
-void trans_point(struct expr* p, struct expr* v, struct env *env){
+struct expr* trans_point(struct expr* p, struct expr* v, struct env *env){
   assert(p->type == POINT && v->type == POINT);
 
   struct expr * px = p->expr->point.x;
@@ -361,40 +361,39 @@ void trans_point(struct expr* p, struct expr* v, struct env *env){
 
 
 
+  
 
 
 
 
 
-
-  px->expr->num +=  vx->expr->num;
-  py->expr->num +=  vy->expr->num;
+  return mk_point(mk_int(px->expr->num +  vx->expr->num),  mk_int(py->expr->num +  vy->expr->num));
 
 }
 
 struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
   	struct expr * p1 ;
 	struct expr *next;
-	struct expr *newfig	= fig;
+	struct expr *newfig	;
 
 	char test[12][12] = {"ID", "FUN", "APP", "NUM", "OP", "COND", "CELL", "NIL", "POINT", "PATH", "CIRCLE","BEZIER"};
 
 
-	switch (newfig->type){
+	switch (fig->type){
 
 	  case POINT:
-		trans_point(newfig,vect,env);
+		newfig =  trans_point(fig,vect,env);
 		return newfig;
 	  case PATH:
-		   p1 = newfig->expr->path.point;
+		   p1 = fig->expr->path.point;
 		  
 			while(p1->type == ID){
 				p1 = id(p1,env);
-				}
-
+			}
+			
+			newfig = mk_path(trans_point(p1,vect,env),NULL);
 		
-		trans_point(p1,vect,env);
-		next = newfig->expr->path.next;
+		next = fig->expr->path.next;
 
 		while(next){
 			p1 = next->expr->path.point;
@@ -403,7 +402,7 @@ struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
 				p1 = id(p1,env);
 				
 			}
-			trans_point(p1,vect,env);
+			newfig = mk_path(newfig,trans_point(p1,vect,env));
 			next = next->expr->path.next;
 
 		
@@ -412,7 +411,7 @@ struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
 		return newfig;	
 
 	  case CIRCLE:
-			p1 = newfig->expr->circle.center;
+			p1 = fig->expr->circle.center;
 		   
 			while(p1->type == ID){
 				p1 = id(p1,env);
@@ -420,26 +419,26 @@ struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
 			}
 
 			
-			trans_point(p1,vect,env);
+			newfig = mk_circle(trans_point(p1,vect,env),fig->expr->circle.radius);
 			return newfig;
 
-
 	  case BEZIER:
-			p1 = newfig->expr->bezier.pt1;
+			p1 = fig->expr->bezier.pt1;
 			while(p1->type == ID){
 				p1 = id(p1,env);
 			}
 
-		
-			trans_point(p1,vect,env);
-			next = newfig->expr->bezier.next;
+			newfig = mk_bezier(trans_point(p1,vect,env),NULL);
+			
+			next = fig->expr->bezier.next;
 
 			while(next){
 				p1 = next->expr->bezier.pt1;
 				while(p1->type == ID){
 					p1 = id(p1,env);
 				}
-				trans_point(p1,vect,env);
+			    
+				newfig = mk_bezier(newfig,trans_point(p1,vect,env));
 				next = next->expr->bezier.next;
 
 			
@@ -448,8 +447,8 @@ struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
 			return newfig;	
   
 		default:
-			printf("------->%s is not a image object\n",test[newfig->type]);
-			return newfig;
+			printf("------->%s is not a image object\n",test[fig->type]);
+			return fig;
 
 
   
