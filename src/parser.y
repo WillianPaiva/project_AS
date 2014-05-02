@@ -101,7 +101,9 @@ e   : e T_MINUS e                                          { $$ = mk_app(mk_app(
 	| T_CIRCLE '(' e[c] ',' e[r] ')'                       { $$ = mk_circle($c,$r);}
     | T_TRANS '(' e[fig] ',' e[vect] ')'				   {conf->closure = mk_closure(mk_app(mk_app(mk_op(TRANS),$fig),$vect),env);
 															conf->stack=NULL; step(conf);  $$ = conf->closure->expr ;}
-/*| T_ROT '(' e[fig] ',' e[centre] ',' e[angl] ')' { }*/
+| T_ROT '(' e[fig] ',' e[centre] ',' e[rap] ')'				   {conf->closure = mk_closure(mk_app(mk_app(mk_app(mk_op(ROT),$fig),$centre),$rap),env);
+															conf->stack=NULL; step(conf);  $$ = conf->closure->expr ;}
+
 /*| T_HOM '(' e[fig] ',' e[centre] ',' e[ration] ')' { }*/
 	| e T_PATH e                                           { $$ = mk_path($1,mk_path($3,NULL));}
 	| e T_PLUS e                                           { $$ = mk_app(mk_app(mk_op(PLUS),$1),$3);}
@@ -144,7 +146,7 @@ list	: e[ex]					{$$ = mk_cell($ex,mk_nil());}
 int main(int argc, char *argv[])
 {
 
-
+  int test = 1;
       yyparse();
 
   return EXIT_SUCCESS;
