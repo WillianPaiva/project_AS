@@ -146,7 +146,7 @@ list	: e[ex]					{$$ = mk_cell($ex,mk_nil());}
 int main(int argc, char *argv[])
 {
 
-  int test = 1;
+
       yyparse();
 
   return EXIT_SUCCESS;

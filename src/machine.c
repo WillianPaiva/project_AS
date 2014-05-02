@@ -289,6 +289,7 @@ void map(struct expr * dr, struct env *env){
 	html_head(f);
 	draw(dr,env,f);
 	html_tail(f);
+	fclose(f);
 	printf("output.html created\n");
 
 
