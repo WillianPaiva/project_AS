@@ -135,12 +135,10 @@ void html_tail(FILE *f){
 }
 
 void draw_path(struct expr * dr, struct env * env,FILE *f){
-	struct expr *p1 = dr->expr->path.point;
-	while(p1->type == ID){
+  struct expr *p1 = dr->expr->path.point;
+  while(p1->type == ID){
 		p1 = id(p1,env);	
 	}
-
-	assert(p1->type == POINT);
 
 	int x = p1->expr->point.x->expr->num;
     int y = p1->expr->point.y->expr->num;
@@ -152,10 +150,9 @@ void draw_path(struct expr * dr, struct env * env,FILE *f){
 		while(p1->type == ID){
 			p1 = id(p1,env);	
 		}
-		assert(p1->type == POINT);
 		x = p1->expr->point.x->expr->num;
 		y = p1->expr->point.y->expr->num;
-
+	
 			fprintf(f,"			ctx.lineTo(%d,%d);\n",x,y);
 			next = next->expr->path.next;
 		
@@ -242,46 +239,44 @@ void draw_bezier(struct expr * dr,struct env *env, FILE *f){
 void draw(struct expr * dr, struct env *env,FILE *f){
 	char test[12][12] = {"ID", "FUN", "APP", "NUM", "OP", "COND", "CELL", "NIL", "POINT", "PATH", "CIRCLE","BEZIER"};
 	switch(dr->type){
-		case PATH:{
-			draw_path(dr,env,f);
-			return;
-				  }
-		case CIRCLE:{
-			draw_circle(dr,env,f);
-			return;
-					}
-		case BEZIER:{
-			draw_bezier(dr,env,f);
-			return;
-					}
-		case CELL:{
-			struct expr *next = dr->expr->cell.next;
-			struct expr *image = dr->expr->cell.ex;
-
-			while(image->type == ID){
-					image = id(image,env);			
-			 }
-
-			
-			draw(image,env,f);
-			if(next){
-				draw(next,env,f);
-			}
-
-			return;
-				  }
-		case NIL:{
-			return;
-				 }
-		default:{
-			printf("------->%s is not a drawble object\n",test[dr->type]);
-			return;
-				}
-	
+	case PATH:{
+	  draw_path(dr,env,f);
+	  return;
+		}
+	case CIRCLE:{
+	  draw_circle(dr,env,f);
+	  return;
 	}
-
-
-
+	case BEZIER:{
+	  draw_bezier(dr,env,f);
+	  return;
+	}
+	case CELL:{
+	  struct expr *next = dr->expr->cell.next;
+	  struct expr *image = dr->expr->cell.ex;
+	  
+	  while(image->type == ID){
+	    image = id(image,env);			
+	  }
+	  
+	  
+	  draw(image,env,f);
+	  if(next){
+	    draw(next,env,f);
+	  }
+	  
+	  return;
+	}
+	case NIL:{
+	  return;
+	}
+	default:{
+	  printf("------->%s is not a drawble object\n",test[dr->type]);
+	  return;
+	}
+	  
+	}
+	
 }
 
 void map(struct expr * dr, struct env *env){
@@ -299,7 +294,7 @@ void map(struct expr * dr, struct env *env){
 
 }
 
-void Rotate_point(struct expr* p, struct expr* v, int angle, struct env *env)
+struct expr* rotate_point(struct expr* p, struct expr* v, int angle, struct env *env)
 { 
 	  assert(p->type == POINT && v->type == POINT);
 
@@ -330,8 +325,7 @@ void Rotate_point(struct expr* p, struct expr* v, int angle, struct env *env)
 	int x = px->expr->num ;
 	int y =	py->expr->num;
 	float theta = angle*(PI/180);
-    px->expr->num = refy + (x-refx)*cos(theta)-(y-refy)*sin(theta);
-	py->expr->num = refy + (x-refx)*sin(theta)+(y-refy)*cos(theta);
+	return mk_point(mk_int(refy + (x-refx)*cos(theta)-(y-refy)*sin(theta)),mk_int(refy + (x-refx)*sin(theta)+(y-refy)*cos(theta)));
 
 }
 
@@ -404,7 +398,7 @@ struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
 				p1 = id(p1,env);
 				
 			}
-			newfig = mk_path(newfig,trans_point(p1,vect,env));
+			newfig = mk_path(trans_point(p1,vect,env),newfig);
 			next = next->expr->path.next;
 
 		
@@ -440,7 +434,90 @@ struct expr *translater(struct expr* fig, struct expr* vect, struct env *env){
 					p1 = id(p1,env);
 				}
 			    
-				newfig = mk_bezier(newfig,trans_point(p1,vect,env));
+				newfig = mk_bezier(trans_point(p1,vect,env),newfig);
+				next = next->expr->bezier.next;
+
+			
+			}
+
+			return newfig;	
+  
+		default:
+			printf("------->%s is not a image object\n",test[fig->type]);
+			return fig;
+
+
+  
+  }
+}
+
+struct expr *rotate(struct expr* fig, struct expr* vect,int angle, struct env *env){
+  	struct expr * p1 ;
+	struct expr *next;
+	struct expr *newfig	;
+
+	char test[12][12] = {"ID", "FUN", "APP", "NUM", "OP", "COND", "CELL", "NIL", "POINT", "PATH", "CIRCLE","BEZIER"};
+
+	switch (fig->type){
+
+	  case POINT:
+	    newfig =  rotate_point(fig,vect,angle,env);
+		return newfig;
+	  case PATH:
+		   p1 = fig->expr->path.point;
+		  
+			while(p1->type == ID){
+				p1 = id(p1,env);
+			}
+			
+			newfig = mk_path(rotate_point(p1,vect,angle,env),NULL);
+		
+		next = fig->expr->path.next;
+
+		while(next){
+			p1 = next->expr->path.point;
+			 
+			while(p1->type == ID){
+				p1 = id(p1,env);
+				
+			}
+			newfig = mk_path(rotate_point(p1,vect,angle,env),newfig);
+			next = next->expr->path.next;
+
+		
+		}
+
+		return newfig;	
+
+	  case CIRCLE:
+			p1 = fig->expr->circle.center;
+		   
+			while(p1->type == ID){
+				p1 = id(p1,env);
+			
+			}
+
+			
+			newfig = mk_circle(rotate_point(p1,vect,angle,env),fig->expr->circle.radius);
+			return newfig;
+
+	  case BEZIER:
+			p1 = fig->expr->bezier.pt1;
+			while(p1->type == ID){
+				p1 = id(p1,env);
+			}
+
+			newfig = mk_bezier(rotate_point(p1,vect,angle,env),NULL);
+			
+			next = fig->expr->bezier.next;
+
+			while(next){
+				p1 = next->expr->bezier.pt1;
+				while(p1->type == ID){
+					p1 = id(p1,env);
+				}
+			    
+				newfig = mk_bezier(rotate_point(p1,vect,angle,env),newfig);
 				next = next->expr->bezier.next;
 
 			
@@ -629,11 +706,26 @@ void step(struct configuration *conf){
        eval_arg(conf,arg2);
        t2 = get_point(conf->closure);
        conf->closure = mk_closure(translater(t1,t2,conf->closure->env),NULL);
-	 return;
+       return;
+     }
+     if(stack==NULL){return;}
+     struct closure *arg3 = stack->closure;
+     stack = pop_stack(stack);
+     int t3;
+     switch (expr->expr->op){
+     case ROT:
+       eval_arg(conf,arg1);
+       t1 = get_point(conf->closure);
+       eval_arg(conf,arg2);
+       t2 = get_point(conf->closure);
+       eval_arg(conf,arg3);
+       t3 = get_num(conf->closure);    
+       conf->closure = mk_closure(rotate(t1,t2,t3,conf->closure->env),NULL);
+       return;  
      default: assert(0);
      }   
     }
     ;
   default: assert(0);
-}
+  }
 }

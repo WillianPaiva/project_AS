@@ -121,9 +121,8 @@ let ba = {20,20};
 let bb = {20,100};
 let bc = {200,100};
 let bd = {200,20};
-let bg = Bezier(ba,bb,bc,bd);
+let bg = rotation(Bezier(ba,bb,bc,bd),bc,190);
 
-translate(bg,{10,20});
 
 
 
@@ -137,7 +136,7 @@ let c = translate(cc,{0,60});
 let d = translate(cc,{0,80});
 let e = translate(cc,{0,100});
 
-Draw([a,b,c,d,e]);
+Draw([a,b,c,d,e,pd,bg,cc]);
 
 
 
