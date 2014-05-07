@@ -108,9 +108,19 @@ print"/* tests sur les objets */";
 print"/************************/";
 print"";
 
+
+print"Création d'un fichier output.html avec 3 figures";
+print"Une rotation + translation d'une courbe de bezier";
+print"Une rotation + translation d'un cercle";
+print"Une rotation + translation d'un chemin représentant un triangle";
+
+print"let ca = {150,150};";
+print"let cb = Cercle(ca,60);";
 let ca = {150,150};
 let cb = Cercle(ca,60);
 
+print"let ac = rotate(translate(cb,{0,20}),ca,-30);";
+print"un total de 12 rotations + translations..";
 let ac = rotate(translate(cb,{0,20}),ca,-30);
 let bc = rotate(translate(ac,{0,20}),ca,-30);
 let cc = rotate(translate(bc,{0,20}),ca,-30);
@@ -125,11 +135,18 @@ let kc = rotate(translate(jc,{0,20}),ca,-30);
 let lc = rotate(translate(kc,{0,20}),ca,-30);
 let lcc = [ac,bc,cc,dc,ec,fc,gc,hc,ic,jc,kc,lc];
 
+print"let pa = {700,700};";
+print"let pb = {700,900};";
+print"let pc = {900,800};";
+print"let pd = pa--pb--pc--pa;";
+
 let pa = {700,700};
 let pb = {700,900};
 let pc = {900,800};
 let pd = pa--pb--pc--pa;
 
+print"let ap = rotate(translate(pd,{0,20}),pa,-30);";
+print"un total de 12 rotations + translations..";
 let ap = rotate(translate(pd,{0,20}),pa,-30);
 let bp = rotate(translate(ap,{0,20}),pa,-30);
 let cp = rotate(translate(bp,{0,20}),pa,-30);
@@ -144,6 +161,11 @@ let kp = rotate(translate(jp,{0,20}),pa,-30);
 let lp = rotate(translate(kp,{0,20}),pa,-30);
 let lt = [ap,bp,cp,dp,ep,fp,gp,hp,ip,jp,kp,lp];
 
+print"let ba = {400,400};";
+print"let bb = {400,500};";
+print"let bc = {500,500};";
+print"let bd = {500,400};";
+print"let bg = Bezier(ba,bb,bc,bd);";
 
 let ba = {400,400};
 let bb = {400,500};
@@ -151,6 +173,9 @@ let bc = {500,500};
 let bd = {500,400};
 let bg = Bezier(ba,bb,bc,bd);
 
+
+print"let ab = rotate(translate(bg,{0,20}),ba,-30);";
+print"un total de 12 rotations + translations..";
 let ab = rotate(translate(bg,{0,20}),ba,-30);
 let bb = rotate(translate(ab,{0,20}),ba,-30);
 let cb = rotate(translate(bb,{0,20}),ba,-30);
