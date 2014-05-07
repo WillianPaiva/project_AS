@@ -14,39 +14,48 @@
   struct configuration concrete_conf;
   struct configuration *conf = &concrete_conf;
   struct closure *temp;
+
+  /*******************************************/
+  /* FONCTION POUR L'AFFICHAGE DANS LE SHELL */
+  /*******************************************/
+
   void print_exp(struct configuration *conf){ 
-	if(conf->closure->expr->type==NUM){
-     printf(">>> %d\n",conf->closure->expr->expr->num);
-   }
+    if(conf->closure->expr->type==NUM){
+      printf(">>> %d\n",conf->closure->expr->expr->num);
+    }
     if(conf->closure->expr->type==POINT){
 
-		struct expr * px = conf->closure->expr->expr->point.x;
-		while(px->type == ID){
-			px = id(px,conf->closure->env);
+      struct expr * px = conf->closure->expr->expr->point.x;
+      while(px->type == ID){
+	px = id(px,conf->closure->env);
 			
-			}
+      }
 
-		struct expr * py = conf->closure->expr->expr->point.y;
-		while(py->type == ID){
-			py = id(py,conf->closure->env);
+      struct expr * py = conf->closure->expr->expr->point.y;
+      while(py->type == ID){
+	py = id(py,conf->closure->env);
 			
-		 }
+      }
 
-     printf(">>> POINT X=%d Y=%d \n",px->expr->num , py->expr->num );
-   }
-   }
-   struct expr * step_conf(struct expr *ex){
-			conf->closure = mk_closure(ex,env);
-			conf->stack=NULL;
-			step(conf);
-			return conf->closure->expr;
+      printf(">>> POINT X=%d Y=%d \n",px->expr->num , py->expr->num );
+    }
+  }
+
+  
+  
+  struct expr * step_conf(struct expr *ex){
+    conf->closure = mk_closure(ex,env);
+    conf->stack=NULL;
+    step(conf);
+    return conf->closure->expr;
    
-   }
+  }
 
-%}
+  %}
 
-
-
+/***********/
+/** UNION **/
+/***********/
 %union {
   char* id;
   int num;
@@ -83,33 +92,36 @@
  /*GRAMMAIRE UTILISEE*/
 
  /*Terminal*/
-s       :s e[expr] FIN_EXPR {step_conf($expr); print_exp(conf);}
-		|s en FIN_EXPR				   {env = $2;}
-		|s T_PRINT FIN_EXPR			   {$2[strlen($2)-1] = 0;printf("%s\n",$2);}
-		|
-		;
+s       :s e[expr] FIN_EXPR                        {step_conf($expr); print_exp(conf);}
+	|s en FIN_EXPR				   {env = $2;}
+	|s T_PRINT FIN_EXPR			   {$2[strlen($2)-1] = 0;printf("%s\n",$2);}
+	|
+	;
 
 /*Variable d'environnement lors de l'affectation de variables*/
-en  :T_LET T_ID[x] T_EQUAL e[expr]                                  {$$ = push_rec_env($x,$expr,env);}
-    ;
+en  :	T_LET T_ID[x] T_EQUAL e[expr]              {$$ = push_rec_env($x,$expr,env);}
+	;
 
-/*Expressions régulières*/
+
 
 
 /*Reconnaissance d'entiers*/
-e   : e T_MINUS e                                          { $$ = mk_app(mk_app(mk_op(MINUS),$1),$3);}
-	| T_NUM												   { $$ = mk_int($1);}
-	| T_MINUS e											   { $$ = mk_app(mk_app(mk_op(MULT),mk_int(-1)),$2);}
-	| T_DRAW '(' e[d] ')'								   { $$ = mk_app(mk_op(DRAW),$d); }	
-	| T_POP e[l]										   { $$ = mk_app(mk_op(POP),$l);}
-	| T_NEXT e[l]										   { $$ = mk_app(mk_op(NEXT),$l);}
-	|'{' e[x] ',' e[y] '}'								   { $$ = mk_point($x,$y);}	
+e   : e T_MINUS e                                              { $$ = mk_app(mk_app(mk_op(MINUS),$1),$3);}
+	| T_NUM						       { $$ = mk_int($1);}
+	| T_MINUS e					       { $$ = mk_app(mk_app(mk_op(MULT),mk_int(-1)),$2);}
+	/* fonction draw */
+	| T_DRAW '(' e[d] ')'				       { $$ = mk_app(mk_op(DRAW),$d); }	
+
+	/* figures + opérations sur figures */
+	|'{' e[x] ',' e[y] '}'				       { $$ = mk_point($x,$y);}	
 	| T_BEZIER '(' e[p1] ',' e[p2] ',' e[p3] ',' e[p4] ')' { $$ = mk_bezier($p1,mk_bezier($p2,mk_bezier($p3,mk_bezier($p4,NULL))));}
 	| T_CIRCLE '(' e[c] ',' e[r] ')'                       { $$ = mk_circle($c,$r);}
-    | T_TRANS '(' e[fig] ',' e[vect] ')'				   { $$ = step_conf(mk_app(mk_app(mk_op(TRANS),$fig),$vect));}
-    | T_ROT '(' e[fig] ',' e[centre] ',' e[rap] ')'		   { $$ = step_conf(mk_app(mk_app(mk_app(mk_op(ROT),$fig),$centre),$rap));}
-    | T_HOM '(' e[fig] ',' e[centre] ',' e[rap] ')'		   { $$ = step_conf(mk_app(mk_app(mk_app(mk_op(HOM),$fig),$centre),$rap));}
+	| T_TRANS '(' e[fig] ',' e[vect] ')'		       { $$ = step_conf(mk_app(mk_app(mk_op(TRANS),$fig),$vect));}
+	| T_ROT '(' e[fig] ',' e[centre] ',' e[rap] ')'	       { $$ = step_conf(mk_app(mk_app(mk_app(mk_op(ROT),$fig),$centre),$rap));}
+	| T_HOM '(' e[fig] ',' e[centre] ',' e[rap] ')'	       { $$ = step_conf(mk_app(mk_app(mk_app(mk_op(HOM),$fig),$centre),$rap));}
 	| e T_PATH e                                           { $$ = mk_path($1,mk_path($3,NULL));}
+
+	/* op de bases */
 	| e T_PLUS e                                           { $$ = mk_app(mk_app(mk_op(PLUS),$1),$3);}
 	| e T_DIV e                                            { $$ = mk_app(mk_app(mk_op(DIV),$1),$3);}
 	| e T_MULT e                                           { $$ = mk_app(mk_app(mk_op(MULT),$1),$3);}
@@ -119,40 +131,63 @@ e   : e T_MINUS e                                          { $$ = mk_app(mk_app(
 	| e T_GE e                                             { $$ = mk_app(mk_app(mk_op(GE),$1),$3) ;}
 	| e T_OR e                                             { $$ = mk_app(mk_app(mk_op(OR),$1),$3) ;}
 	| e T_AND e                                            { $$ = mk_app(mk_app(mk_op(AND),$1),$3) ;}
-	| T_ID                                                 { $$ = mk_id($1);}/*Reconnaissance d'identificateurs et de variables*/
 	| e T_EQ e                                             { $$ = mk_app(mk_app(mk_op(EQ),$1),$3) ;}
 	| T_NOT e[expr]                                        { $$ = mk_app(mk_op(NOT),$expr) ;}
-	| T_FUN T_ID[var] arg_list[expr]                       { $$ = mk_fun($var,$expr);} /*Définition de fonctions*/
-	| T_LET T_ID[x] T_EQUAL e[arg] T_IN e[exp]             { $$ = mk_app(mk_fun($x,$exp),$arg); }/*Fonction IN*/
-	| e[exp] T_WHERE T_ID[x] T_EQUAL e[arg]                { $$ = mk_app(mk_fun($x,$exp),$arg); }/*Fonction WHERE*/
+	
+	/*Reconnaissance d'identificateurs et de variables*/
+	| T_ID                                                 { $$ = mk_id($1);}
+
+	/* Définition fonction */
+	| T_FUN T_ID[var] arg_list[expr]                       { $$ = mk_fun($var,$expr);}
+
+	/* LET IN */
+	| T_LET T_ID[x] T_EQUAL e[arg] T_IN e[exp]             { $$ = mk_app(mk_fun($x,$exp),$arg); }
+
+	/* WHERE */
+	| e[exp] T_WHERE T_ID[x] T_EQUAL e[arg]                { $$ = mk_app(mk_fun($x,$exp),$arg); }
+
+	/* IF THEN ELSE */
 	| T_IF e[cond] T_THEN e[then_br] T_ELSE e[else_br]     { $$ = mk_cond($cond, $then_br, $else_br) ;}
-	| '[' list[l] ']'                                      { $$ = $l;}/*OP sur Listes*/
+
+	/* op sur les listes + liste */
+	| T_POP e[l]					       { $$ = mk_app(mk_op(POP),$l);}
+	| T_NEXT e[l]					       { $$ = mk_app(mk_op(NEXT),$l);}
+	| '[' list[l] ']'                                      { $$ = $l;}
 	| e[exp] T_PUSH e[l]                                   { $$ = mk_app(mk_app(mk_op(PUSH),$exp),$l);}
-	|  e[fun] e[arg] %prec FUNCTION_APPLICATION            { $$ = mk_app($fun,$arg);}/*Exécution de fonctions à plusieurs variables*/
-	| '(' e ')'                                            { $$ = $2;}/*Ignorer les parentheses inutiles*/
-    ;
+
+	/* Composition de fonction */
+	|  e[fun] e[arg] %prec FUNCTION_APPLICATION            { $$ = mk_app($fun,$arg);}
+
+	/* Ignorer les parenthèses inutiles */
+	| '(' e ')'                                            { $$ = $2;}
+	;
 
 
 
-/*Définition multiple de fonctions*/
-arg_list:T_ARROW e                                                  {$$=$2;}
-        |T_ID[var] arg_list                                         {$$=mk_fun ($1, $2); }
-        ;
+/* Définition de fonction à argument multiples */
+arg_list:T_ARROW e                                             { $$=$2;}
+|T_ID[var] arg_list                                            {$ $=mk_fun ($1, $2); }
+;
 
-
+/* LISTES */
 list	: e[ex]					{$$ = mk_cell($ex,mk_nil());}
-		| e[ex] ',' list[l] 	{$$ = mk_cell($ex,$l);}
-		|	      				{$$ = mk_nil();}
-		;
+	| e[ex] ',' list[l] 	                {$$ = mk_cell($ex,$l);}
+	|	      				{$$ = mk_nil();}
+	;
 
 %%
 
+
+/*******************************/
+/********* MAIN ****************/
+/*******************************/
+	
 int main(int argc, char *argv[])
 {
-	extern int yydebug;
-	yydebug = 1;
+  extern int yydebug;
+  yydebug = 1;
 
-      yyparse();
+  yyparse();
 
   return EXIT_SUCCESS;
 }
