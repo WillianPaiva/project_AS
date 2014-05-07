@@ -125,9 +125,9 @@ struct expr *id(struct expr *id, struct env *env){
 }
 
 
-/***********************************************/
+/************************************************/
 /**** Fonctions pour l'affichage des figures ****/
-/***********************************************/
+/************************************************/
 
 /* print l'en-tete du code javascript pour la page html */ 
 void html_head(FILE *f){

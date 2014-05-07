@@ -5,54 +5,6 @@ enum op{PLUS, MINUS, MULT, DIV, LEQ, LE, GEQ, GE, EQ, OR, AND, NOT, PUSH, POP, N
 
 
 /********************************************************************************************/
-/********************************** STRUCTURES FOURNIES *************************************/
-/********************************************************************************************/
-
-struct expr;
-
-struct fun{
-  char *id;
-  struct expr *body;
-};
-
-struct app{
-  struct expr *fun;
-  struct expr *arg;
-};
-
-struct cond{
-  struct expr *cond;
-  struct expr *then_br;
-  struct expr *else_br;
-};
-
-union node{
-  char *id;
-  struct fun fun;
-  struct app app;
-  enum op op;
-  int num;
-  struct cond cond;
-
-  /* STRUCT RAJOUTEES */
-  struct cell cell;
-  struct point point;
-  struct path path;
-  struct circle circle;
-  struct bezier bezier;
-
-};
-
-struct expr{
-  enum expr_kind type;
-  union node *expr;
-};
-
-/********************************************************************************************/
-/********************************************************************************************/
-/********************************************************************************************/
-
-/********************************************************************************************/
 /********************************** STRUCTURES RAJOUTEES ************************************/
 /********************************************************************************************/
 
@@ -84,6 +36,54 @@ struct path {
 struct circle {
   struct expr* center;
   struct expr* radius;
+};
+
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+
+/********************************************************************************************/
+/********************************** STRUCTURES FOURNIES *************************************/
+/********************************************************************************************/
+
+struct expr;
+
+struct fun{
+  char *id;
+  struct expr *body;
+};
+
+struct app{
+  struct expr *fun;
+  struct expr *arg;
+};
+
+struct cond{
+  struct expr *cond;
+  struct expr *then_br;
+  struct expr *else_br;
+};
+
+union node{
+  char *id;
+  struct fun fun;
+  struct app app;
+  enum op op;
+  int num;
+  struct cond cond;
+
+  /* Struct rajoutées */
+  struct cell cell;
+  struct point point;
+  struct path path;
+  struct circle circle;
+  struct bezier bezier;
+
+};
+
+struct expr{
+  enum expr_kind type;
+  union node *expr;
 };
 
 /********************************************************************************************/

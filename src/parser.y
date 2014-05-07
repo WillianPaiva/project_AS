@@ -166,7 +166,7 @@ e   : e T_MINUS e                                              { $$ = mk_app(mk_
 
 /* Définition de fonction à argument multiples */
 arg_list:T_ARROW e                                             { $$=$2;}
-|T_ID[var] arg_list                                            {$ $=mk_fun ($1, $2); }
+|T_ID[var] arg_list                                            { $$=mk_fun ($1, $2); }
 ;
 
 /* LISTES */
@@ -184,8 +184,8 @@ list	: e[ex]					{$$ = mk_cell($ex,mk_nil());}
 	
 int main(int argc, char *argv[])
 {
-  extern int yydebug;
-  yydebug = 1;
+  //extern int yydebug;
+  //yydebug = 1;
 
   yyparse();
 
