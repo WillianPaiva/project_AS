@@ -1,7 +1,9 @@
-\documentclass[12pt,a4paper]{article}
-\usepackage[T1]{fontenc}
+\documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage[french]{babel}
+\setlength{\parindent}{4em}
+\setlength{\parskip}{1em}
+\usepackage[T1]{fontenc}
 \usepackage{color}
 \usepackage{listings}
 \usepackage{hyperref}
@@ -11,9 +13,14 @@
 \usepackage{amssymb}
 \usepackage{mathrsfs}
 \usepackage{hyperref}
+\setlength{\parskip}{1em}
+\setlength{\parindent}{4em}
+
+
+
 
 \begin{document}
-\title{ \href{https://github.com/WillianPaiva/project_AS}{\textbf{Projet d'analyse syntaxique}}}
+\title{ \href{https://github.com/WillianPaiva/project_AS}{\textbf{Analyse Syntaxique}}}
 \author{RAKOTONIERA Hoby, VER VALEN PAIVA Willian et LAULAN Antoine}
 
  
@@ -25,8 +32,239 @@
 \section{Présentation des fonctionnalités implémentées}
 
 \subsection{Première partie du projet}
+\begin{description}
+
+
+
+
+\item[Question 1]\hfill \\
+
+Le but de la première partie du projet était d'écrire un analyseur 
+syntaxique. Nous avions comme source une machine virtuelle \textbf{\emph{(machine.c) }}
+qui permettait de construire les arbres syntaxiques correspondant à des 
+expressions, en utilisant les constructeurs fournis dans le fichier \emph{\textbf{expr.c}}.
+\bigskip
+Nous avons donc implémenté un analyseur lexical flex \textbf{\emph{(parser.l)}} et un 
+analyseur syntaxique bison \textbf{\emph{(parser.y)}}. 
+\bigskip
+Tout d'abord,nous avons commencé par nous inspirer de l'exemple 
+d'un TD pour implémenter une calculatrice. Nous avons, à l'aide du lexique 
+reconnu par le fichier \emph{flex}, codé les opérations de base dans le fichier \emph{bison} 
+en utilisant les fonctions données pour construire les arbres \textbf{\emph{mk\_*}}. Il nous a 
+fallu aussi créer des règles de priorités entre les opérations pour éviter les 
+conflits.
+\bigskip
+Notre calculatrice une fois terminée était capable de faire toutes les 
+opérations de base : \textbf{\emph{+, -, *, /}}, ainsi que toutes les opérations de 
+\textbf{\emph{comparaisons/égalité}} et pour évaluer de telles expressions, il suffisait de 
+taper l'opération dans le \textbf{\emph{parser.out}} suivis d'un \textbf{\emph{« ; »}}.
+\bigskip
+Exemples d'expressions évaluées par notre calculatrice de base :
+\bigskip
+\begin{itemize}
+\item[•] -  3 + 5 ;  // cela imprimait dans le terminal « >> 8 »
+\item[•]-  3 < 4 ;  // cela imprimait dans le terminal « >> 1 »
+\end{itemize}
+\bigskip
+Ensuite, nous avons ajouté comme fonctionnalité la déclaration de variables du type :
+\bigskip
+ \begin{verbatim}
+ let x = expression ; 
+ \end{verbatim}
+ \bigskip 
+ ainsi que le if exp then exp else exp ;
+ \bigskip
+\begin{verbatim}
+	T_LET T_ID[x] T_EQUAL e[expr] {$$ = push_rec_env($x,$expr,env);}
+\end{verbatim}
+\bigskip
+  Pour ce faire, nous avons utilisé la fonction donnée \emph{\textbf{push\_rec\_env}} afin de sauvegarder
+  l'environnement lors de la déclaration de la variable.
+  
+  
+  \bigskip
+  Une fois ceci fait, nous étions capables de faire des opérations entre variables du style :
+  \bigskip
+\begin{verbatim}
+let a = 2 ;
+let b = 3 ;
+a+b ;
+>>> 5
+\end{verbatim}
+\bigskip
+Grâce à cela nous avons pu implémenter à l'aide des fonctions fournies la déclaration des fonctions :
+\bigskip
+\begin{verbatim}
+ let f = fun x -> x+1 ;
+\end{verbatim}
+\bigskip  
+
+\item[Question 2]\hfill \\
+Il nous était demandé ici de retirer les parenthèses afin d'écrire des choses comme :
+
+\begin{verbatim}
+(fun x1 ... xn -> expr)   
+\end{verbatim}
+
+
+à la place de
+
+
+\begin{verbatim}
+(fun x1 -> ... (fun xn -> expr)...) 
+\end{verbatim}
+
+
+et
+
+
+\begin{verbatim}
+(f g1 … gn)  
+\end{verbatim}
+
+
+à la place de 
+
+
+\begin{verbatim}
+(… (f  g1)... gn) 
+\end{verbatim}
+
+
+	Nous y sommes parvenus et nous avons même retiré toutes les parenthèses mais cela nous a posé quelques problèmes que nous expliquerons dans la partie du rapport « \textbf{\emph{difficultés rencontrées}}».
+
+ \item[Question 3]\hfill \\ 
+ Nous avons implémenté le \emph{let in} et le \emph{where} afin de pouvoir écrire des expressions comme : 
+ \bigskip
+\begin{verbatim}
+let x = 5 in x < 10 ;
+x < 10 where x=5 ;
+\end{verbatim}
+
+\item[Question 4]\hfill \\ 
+Cette partie était notée « optionnelle ». Cependant, comme nous étions en avance, nous l'avons commencée et de plus, nous savions que les listes étaient demandées dans la deuxième partie du projet.
+  
+\end{description}
+
+
 
 \subsection{Deuxième partie du projet}
+\begin{description}
+\item[Question 1: Ajout des listes]\hfill \\ 
+Nous avons implémenté, comme il était demandé, la gestion des listes par la machine.
+Pour ce faire, nous avons créé un nouveau type de données \textbf{\emph{CELL}} . Exemple :
+\bigskip
+\begin{verbatim}
+struct cell{
+	struct expr *ex ;
+	struct expr *next ;
+} ;
+\end{verbatim}
+\bigskip
+
+
+
+Il a fallu modifier type \emph{union node} en rajoutant le type \textbf{\emph{CELL}}. Il a fallu aussi créer la fonction \textbf{\emph{mk\_cell}} pour créer les cellules.
+\bigskip
+Nous avons aussi élaboré la fonction \textbf{\emph{mk\_nil}} afin de créer la liste vide, ou des cellules vides. 
+
+	Il nous était demandé de réaliser les 3 opérations de base sur les listes, à savoir : \emph{push},  \emph{pop}, \emph{top} : avec comme nom possible pour pop « head, hd, pop » , pour next « tail, next, tl » et pour push « \textbf{\emph{::}} » .
+	
+	Pour l'utilisation des listes, une grosse modification du fichier \textbf{\emph{machine.c}} a été nécessaire, ainsi que l'implémentation de quelques fonctions subalternes pour nous aider dans la compréhension du code. Il a fallu modifier le code fourni dans les opérations de la machine pour rajouter des « \textbf{\emph{case}} » nécessaires à la gestion des listes, ainsi qu'une fonction d'evaluation des arguments pour chaque case.
+Une fois ceci fait nous pouvions utiliser des listes en les déclarant comme : 
+\bigskip
+\begin{verbatim}
+let l = [exp,...,exp] 
+\end{verbatim}
+\bigskip
+et les opérations :
+\bigskip
+\begin{itemize}
+	\item[•] - push : a::l
+	\item[•] - pop l ou hd l
+	\item[•] - tail l ou next l
+	\item[•] - liste vide []
+\end{itemize}
+\bigskip
+
+\item[Question 2: Ajout de la partie graphique]\hfill \\ 
+\begin{itemize}
+\item[Partie 1:Objets de base]\hfill \\ 
+\bigskip
+Génération de dessins :
+
+Pour cette partie, il s'agissait d'ajouter des types et fonctions de manipulation pour pouvoir définir des dessins et les afficher. Pour ce faire, nous avons d'abord défini des nouveaux types de données :
+	
+\bigskip
+
+\item[•] Point : {e1,e2} où e1 et e2 sont des expressions s'évaluant en NUM (int)
+\bigskip
+\item[•] Chemin (path) : p1- -p2- -...- -pn    où pn sont des expressions s'évaluant en type POINT
+\bigskip
+\item[•] Cercle (circle) : Circle(e1,e2) où e1 et e2 sont des expressions et e1
+s'évalue en type POINT alors que e2 s'évalue en type NUM
+\bigskip
+\item[•] Courbe de Bézier (bezier) : Bezier(e1,e2,e3,e4) où e1,e2,e3,e4 sont des expressions s'évaluant en type POINT.
+\bigskip
+ 
+ Pour chaque type de données il a fallu créer un nouveau « enum kind », modifier le « union node », faire des fonctions de construction du type \textbf{\emph{mk\_*}}.
+ 
+ 
+\bigskip
+Nous avons utilisé ces fonctions dans le \textbf{\emph{parser.y}} pour que notre analyseur syntaxique puisse reconnaître et dessiner ces types de données sur une page HTML.
+
+
+\bigskip
+Ensuite nous avons implémenté une fonction \emph{map} permettant de générer une page html avec du code j\emph{avascript/HTML5 canvas} pour dessiner les nouveaux types de données ci-dessus.
+
+
+\bigskip
+
+
+
+Cette fonction est partagée en plusieurs sous fonctions :
+
+
+
+\bigskip
+
+\item[•] Deux fonctions, \emph{html\_head} et \emph{html\_tail} permettant d'écrire la partie commune du code à toute les pages html générées pour le dessin. 
+\bigskip
+\item[•] Une fonction \emph{draw\_*} pour chaque type de données que l'on peut dessiner.
+\bigskip
+\item[•] Une fonction \emph{draw} générale qui appelle la bonne fonction \emph{draw\_*} en fonction de la figure passée en paramètre.
+\bigskip
+\item[•] Une fonction \emph{map} qui appelle \emph{html\_head()}, \emph{draw()},\emph{html\_tail()}
+
+
+
+\bigskip
+Nous avons ensuite modifié cette fonction pour qu'elle puisse prendre en paramètre une liste d'objets dessinables. La fonction \emph{map} est capable de dessiner sur une page \textbf{\emph{HTML}} plusieurs figures.
+\bigskip
+\bigskip
+\item[Partie 2: Transformation]\hfill \\ 
+
+
+Dans cette partie, le but était d'implémenter des transformations géométriques appliquées aux objets de base codés dans la partie précédente.
+\bigskip
+Trois transformations étaient demandées :
+\bigskip
+
+\item[•] \textbf{\emph{Translation (translate)}} : transformation séparée en deux fonctions. La première, \emph{trans\_point(p,v)} applique une translation au point \emph{p} passé en paramètre par rapport au vecteur \emph{v}. La seconde, \emph{translate()} applique la fonction \emph{trans\_point()} à tous les points de la figure passés en paramètre, et renvoie la figure modifiée par la translation.
+\bigskip
+\item[•] \textbf{\emph{Rotation (rotate)} }: transformation séparée en deux fonctions. La première, \emph{rotate\_point(p,v,a)} applique une rotation au point \emph{p} passé en paramètre par rapport au vecteur \emph{v} et l'angle \emph{a} donné en degrés. La seconde, \emph{rotate()} applique la fonction \emph{rotate\_point()} à tous les points de la figure passés en paramètre, et renvoie la figure modifiée par la rotation.
+\bigskip
+\item[•] \textbf{\emph{Homothétie (scale)}} :  transformation séparée en deux fonctions. La première, \emph{scale\_point(p,v,r)} applique une homothétie au point \emph{p} passé en paramètre par rapport au vecteur \emph{v} et au rapport \emph{r}. La seconde, \emph{scale()} applique la fonction \emph{scale\_point()} à tous les points de la figure passés en paramètre, et renvoie la figure modifiée par l'homothétie.
+
+\end{itemize}
+
+
+
+\end{description}
+
+
+
+
 
 
 
@@ -34,16 +272,110 @@
 
 \subsection{Difficultés rencontrées}
 
+
+Au départ, il a été difficile de bien comprendre les fichiers fournis, car le code n'était pas très commenté. C'est pourquoi quand nous avons commencé à implémenter la calculatrice et la syntaxe de base, nous avons pas mal utilisé la méthode par tâtonnement, c'est à dire sans vraiment comprendre comment cela marchait. Nous avons cependant dû rattraper cela lorsque nous avons commencé à faire des choses plus compliquées comme le \emph{let} et les déclarations de fonctions.
+
+
+
+	Les premières grosses difficultés rencontrées ont été d'enlever les parenthèses dans les applications de fonctions multiples et les fonctions avec plusieurs arguments. Dans un premier temps nous avons retiré les parenthèses pour les fonctions à argument multiples par exemple : 
+	
+	
+\begin{verbatim}
+(fun x y z -> x+y+z)
+\end{verbatim}
+
+ Ce problème a été résolu grâce à l'utilisation d'un arg\_list :
+
+\begin{verbatim}
+arg_list:T_ARROW e           {$$=$2;}        
+        |T_ID[var] arg_list {$$=mk_fun ($1, $2); }
+\end{verbatim}
+
+
+	La seconde difficulté rencontrée l'a été pour enlever les parenthèses dans les applications de fonctions, parce que nous avions affaire à une précédence pour des règles sans terminals, uniquement des non-terminals.
+Par exemple : 	
+	
+\begin{verbatim}
+| e[fun] e[arg]             { $$ = mk_app($fun,$arg);}
+\end{verbatim}
+
+Puisqu'il n'y a pas de token impliqué dans l'application de fonction, les règles normales de précédence \emph{yacc/bison} ne fonctionneront pas sans aide supplémentaire. Pour résoudre cela, nous avons dû déclarer un token fictif, comme par exemple : 
+	
+\begin{verbatim}
+%left FUNCTION_APPLICATION
+\end{verbatim}	
+ Ce token n'est créé que parce qu'on en a besoin pour forcer la précédence de la règle d'application de fonction, comme nous l'avons fait : 
+	
+\begin{verbatim}
+| e[fun] e[arg] %prec FUNCTION_APPLICATION { $$ = mk_app($fun,$arg); }
+\end{verbatim}	
+
+	
+On a utilisé une directive spéciale \textbf{\emph{\%prec}} qui permet d'appliquer une précédence manuellement.
+	
+
+	
+	
+	
+	
+	
+	
+
+	Lorsque nous somme parvenus, dans la partie gestion graphique, au moment où la fonction \emph{map} (qui dessine plusieurs figures sur une page html) devait prendre une liste d'objets en paramètre, nous nous sommes rendu compte d'une erreur sur nos listes.. C'est à dire que lorsque nous avons créé nos listes, nous avons testé celles-ci seulement avec des listes d'entiers et cela fonctionnait correctement. Cependant lorsque nous avons du faire des listes avec autre chose que des entiers, des variables par exemple, nos listes ne marchaient plus.. Le problème était que lors des déclarations de listes comme \emph{let l = [a,b] ;} on obtenait une \emph{syntax error}. Cela nous a pris pas mal de temps pour trouver d'où le problème venait...  Au départ, nous nous sommes concentré sur notre fichier \emph{bison}, pensant que notre syntaxe des listes était mauvaise. Il s'est avéré que le problème venait de notre analyseur lexical..
+	
+	
+\bigskip
+A l'aide de la fonction \textbf{\emph{yydebugg}} nous nous sommes rendu compte que la règle :
+\begin{verbatim}
+	[a-zA-Z]+ {yylval.id = strdup(yytext) ; return T_ID;}	
+\end{verbatim}
+renvoyait \emph{" [a "} au lieu de deux tokens différents. 
+\bigskip
+En remplaçant cette règle par :
+\begin{verbatim}
+	[[:alpha:]_]+  {yylval.id = strdup(yytext) ; return T_ID;} 
+\end{verbatim}
+cela a resolu notre problème, et nous avons pu faire des listes contenant aussi des variables et \emph{a fortiori} des objets.
+	
+\bigskip	
+ aller voir : \url{http://stackoverflow.com/questions/23368667/syntax-not-being-recognized-by-parser-how-to-read-yydebug/23407424#23407424}
+
+
 \subsection{Explications des choix effectués}
 
 
-\section{Diagramme des classes}
+	Par rapport aux choix effectués, il n'y pas de grandes modifications par rapport à ce qui était demandé dans le sujet. Nous avons cependant choisi de faire toute la partie graphique plutôt que de faire un peu de la partie image, et un peu de la partie sons. 
+	
+Concernant les divergences vis-à-vis du sujet, nous avons fait le choix de mettre toutes nos déclarations de fonctions et autre token en anglais pour avoir une homogénéité au niveau de la langue. 
 
+Nous avons aussi choisi, sur les conseils de notre chargé de TD, de retirer toutes les parenthèses concernant les fonctions à arguments multiples et les applications de fonctions multiples. C'est-à-dire que notre analyseur syntaxique est capable d'évaluer des expressions comme :
 
-\section{Avis personnels}
+\begin{verbatim}	
+f x y z -> x+y-z   
+\end{verbatim}
+à la place de 
+\begin{verbatim}
+(f x y z -> x+y-z)
+\end{verbatim}
+et     
+\begin{verbatim}
+f g h i    
+\end{verbatim}
+à la place de
+\begin{verbatim}
+(f g h i)
+\end{verbatim}
+
+	
+Le reste de nos choix a été fait selon ce qui nous semblait le plus naturel, car plusieurs questions nous laissaient libre de nos choix en nous demandant simplement le résultat attendu, sans aucune indication concernant la marche à suivre pour y parvenir.
+
 
 
 \section{Annexes et code du projet}
+
+L'ensemble des codes et des annexes est consultable en suivant le lien ci-dessous : 
+
+\url{https://github.com/WillianPaiva/project_AS}
 
 
 
