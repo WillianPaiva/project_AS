@@ -116,8 +116,11 @@ print"Une rotation + translation d'un chemin représentant un triangle";
 
 print"let ca = {150,150};";
 print"let cb = Cercle(ca,60);";
+print"let cb = scale(cp,ca,12);";
 let ca = {150,150};
-let cb = Cercle(ca,60);
+let cp = Cercle(ca,60);
+let cb = scale(cp,ca,12);
+
 
 print"let ac = rotate(translate(cb,{0,20}),ca,-30);";
 print"un total de 12 rotations + translations..";
@@ -139,11 +142,15 @@ print"let pa = {700,700};";
 print"let pb = {700,900};";
 print"let pc = {900,800};";
 print"let pd = pa--pb--pc--pa;";
+print"let pd = scale(pp,pa,12);";
 
 let pa = {700,700};
 let pb = {700,900};
 let pc = {900,800};
-let pd = pa--pb--pc--pa;
+let pp = pa--pb--pc--pa;
+let pd = scale(pp,pa,12);
+
+
 
 print"let ap = rotate(translate(pd,{0,20}),pa,-30);";
 print"un total de 12 rotations + translations..";
@@ -172,7 +179,6 @@ let bb = {400,500};
 let bc = {500,500};
 let bd = {500,400};
 let bg = Bezier(ba,bb,bc,bd);
-
 
 print"let ab = rotate(translate(bg,{0,20}),ba,-30);";
 print"un total de 12 rotations + translations..";
